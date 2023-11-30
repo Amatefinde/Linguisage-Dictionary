@@ -1,11 +1,12 @@
 __all__ = (
-    "User",
-    "Session",
-    "Literature",
-    "UserWordMeaning",
-    "UserWordImage",
+    "Word",
+    "Sense",
+    "Image",
+    "RowExample",
+    "Example",
 )
 
-from .user import User, Session
-from .literature import Literature
-from .word_meaning import UserWordMeaning, UserWordImage
+from .word import Word
+from .sense import Sense, Image
+from .row_example import RowExample
+from .example import Example
