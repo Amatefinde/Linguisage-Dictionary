@@ -6,6 +6,7 @@ class ParsedSense(TypedDict):
     lvl: str | None
     definition: str
     examples: list[str | None]
+    row_examples: list[str | None]
 
 
 class FullParsedSense(ParsedSense):
@@ -19,38 +20,60 @@ def _check_multiply(soup: BeautifulSoup) -> None:
         )
 
 
-def _determine_lvl(sense: BeautifulSoup):
-    try:
-        return sense.find("div", class_="symbols").find("a")["href"][-2:].upper()
-    except (TypeError, AttributeError) as Ex:
-        pass
+class Sense:
+    def __init__(self, sense: BeautifulSoup, link=None):
+        self.sense = sense
+        self.link = link
+
+        self.__parsed_sense = self.parse_sense()
+
+    def parse_sense(self):
+        parsed_sense: ParsedSense = {
+            "lvl": self._get_lvl(),
+            "examples": self._get_examples(),
+            "row_examples": self._get_row_examples(),
+            "definition": self._get_definition(),
+        }
+
+        return parsed_sense
+
+    @property
+    def parsed_sense(self):
+        return self.__parsed_sense
+
+    def _get_lvl(self) -> str | None:
+        if lvl := self.sense.get("cefr"):
+            return lvl.upper()
+
+    def _get_row_examples(self):
+        try:
+            return self.sense.find("ul", class_="examples").find_all("li")
+        except AttributeError:
+            return []
+
+    def _get_examples(self):
+        row_examples = self._get_row_examples()
+        examples = []
+
+        for row_example in row_examples:  # type: BeautifulSoup
+            if not (example := row_example.find("span", class_="x")):
+                if not (example := row_example.find("span", class_="unx")):
+                    example = row_example
+            examples.append(example.text)
+
+        return examples
+
+    def _get_definition(self):
+        try:
+            return self.sense.find("span", class_="def").text
+        except AttributeError:
+            return self.sense.text
 
 
 def _parse_senses(senses: list[BeautifulSoup], link):
     parsed_senses: list[ParsedSense] = []
-    for sense in senses:  # type : B
-        parsed_sense: ParsedSense = dict()
-        parsed_sense["lvl"] = _determine_lvl(sense)
-
-        try:
-            parsed_sense["definition"] = sense.find("span", class_="def").text
-        except AttributeError:
-            continue
-        row_examples = []
-        try:
-            row_examples = sense.find("ul", class_="examples").find_all("li")
-        except AttributeError:
-            pass
-
-        examples = []
-        for row_example in row_examples:  # type: BeautifulSoup
-            example = row_example.find("span", class_="x")
-            if not example:
-                example = row_example.find("span", class_="unx")
-
-            examples.append(example.text)
-        parsed_sense["examples"] = examples
-
+    for sense in senses:
+        parsed_sense: ParsedSense = Sense(sense, link).parsed_sense
         parsed_senses.append(parsed_sense)
     return parsed_senses
 
