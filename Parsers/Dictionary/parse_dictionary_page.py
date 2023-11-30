@@ -37,6 +37,6 @@ async def _parse_page(row_html: str, link) -> SWord:
     return SWord(word=word, senses=senses)
 
 
-async def main(session: ClientSession, dictionary_word_link: str):
+async def main(session: ClientSession, dictionary_word_link: str) -> SWord:
     row_html = await fetch_page(session, dictionary_word_link)
     return await _parse_page(row_html, dictionary_word_link)
