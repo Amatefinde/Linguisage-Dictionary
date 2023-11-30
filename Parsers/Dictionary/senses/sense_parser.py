@@ -1,13 +1,20 @@
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from core.schemas import SSense
 
 
 class Sense:
-    def __init__(self, sense: BeautifulSoup, link=None):
+    def __init__(self, sense: BeautifulSoup | Tag, link=None):
+        self.__validate_sense(sense, link)
         self.sense = sense
         self.link = link
 
         self.__parsed_sense = SSense.model_validate(self.parse_sense())
+
+    @staticmethod
+    def __validate_sense(sense, link):
+        if type(sense) not in (BeautifulSoup, Tag):
+            raise TypeError('arg: sense - must be  "BeautifulSoup" or "Tag"')
 
     def parse_sense(self) -> SSense:
         parsed_sense = {
@@ -24,12 +31,16 @@ class Sense:
         return self.__parsed_sense
 
     def _get_lvl(self) -> str | None:
-        if lvl := self.sense.get("cefr"):
+        if lvl := self.sense.get("cefr") or self.sense.get("fkcefr"):
             return lvl.upper()
 
-    def _get_row_examples(self, as_str=False) -> list[BeautifulSoup] | list[str]:
+    def _get_row_examples(
+        self, as_str=False
+    ) -> list[BeautifulSoup] | list[str]:
         try:
-            row_examples = self.sense.find("ul", class_="examples").find_all("li")
+            row_examples = self.sense.find("ul", class_="examples").find_all(
+                "li"
+            )
             return (
                 [str(row_example) for row_example in row_examples]
                 if as_str
