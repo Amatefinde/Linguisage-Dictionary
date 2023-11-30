@@ -78,15 +78,17 @@ def _parse_senses(senses: list[BeautifulSoup], link):
     return parsed_senses
 
 
+def _define_short_cut_name(short_cut_g: BeautifulSoup) -> str | None:
+    try:
+        return short_cut_g.find("h2", class_="shcut").text
+    except AttributeError:
+        pass
+
+
 def _parse_short_cuts(short_cuts: list[BeautifulSoup], link):
     full_parsed_senses: list[FullParsedSense] = []
-    short_cut_name: None | str = None
     for short_cut in short_cuts:  # type: BeautifulSoup
-        try:
-            short_cut_name: str | None = short_cut.find("h2", class_="shcut").text
-        except AttributeError:
-            pass
-
+        short_cut_name: str = _define_short_cut_name(short_cut)
         senses: list[BeautifulSoup] | None = short_cut.find_all("li", class_="sense")
         parsed_senses: list[ParsedSense] = _parse_senses(senses, link)
         full_parsed_senses.extend(
