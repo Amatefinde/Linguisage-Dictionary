@@ -25,11 +25,13 @@ def _define_short_cut_name(short_cut_g: BeautifulSoup) -> str | None:
         pass
 
 
-def _get_senses_from_sh_cut_g(short_cuts: list[BeautifulSoup], link):
+def _get_parsed_senses_from_sh_cut_g(short_cuts: list[BeautifulSoup], link):
     all_parsed_senses: list[SSense] = []
     for short_cut in short_cuts:  # type: BeautifulSoup
         short_cut_name: str = _define_short_cut_name(short_cut)
-        senses: list[BeautifulSoup] | None = short_cut.find_all("li", class_="sense")
+        senses: list[BeautifulSoup] | None = short_cut.find_all(
+            "li", class_="sense"
+        )
         parsed_senses: list[SSense] = _parse_senses(senses, link)
         for parsed_sense in parsed_senses:
             parsed_sense.short_cut = short_cut_name
@@ -37,13 +39,27 @@ def _get_senses_from_sh_cut_g(short_cuts: list[BeautifulSoup], link):
     return all_parsed_senses
 
 
-def parse_multiply(row_html: str, link):
-    soup = BeautifulSoup(row_html, "lxml")
+def _get_parser_senses_from_senses_multiple(
+    senses_multiple: BeautifulSoup,
+    link: str,
+) -> list[SSense]:
+    senses: list[BeautifulSoup] | None = senses_multiple.find_all(
+        "li", class_="sense"
+    )
+    return _parse_senses(senses, link)
 
+
+def parse_multiply(soup: BeautifulSoup, link) -> list[SSense]:
     _check_multiply(soup)
 
-    senses: BeautifulSoup = soup.find("ol", class_="senses_multiple")
-    if sh_cut_g := senses.find_all("span", class_="shcut-g"):
-        full_parsed_senses: list[SSense] = _get_senses_from_sh_cut_g(sh_cut_g, link)
-        print(full_parsed_senses)
-        return full_parsed_senses
+    senses_multiple: BeautifulSoup = soup.find("ol", class_="senses_multiple")
+
+    if sh_cut_g := senses_multiple.find_all("span", class_="shcut-g"):
+        parsed_senses: list[SSense] = _get_parsed_senses_from_sh_cut_g(
+            sh_cut_g, link
+        )
+    else:
+        parsed_senses: list[SSense] = _get_parser_senses_from_senses_multiple(
+            senses_multiple, link
+        )
+    return parsed_senses
