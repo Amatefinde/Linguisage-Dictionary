@@ -26,8 +26,8 @@ class PhrasalVerb(BaseModel):
     pass  # todo
 
 
-class Word(BaseModel):
+class SWord(BaseModel):
     word: str
-    meaning: list[SSense] | None
-    phrasal_verbs: list[PhrasalVerb] | None
-    idioms: list[Idiom] | None
+    senses: list[SSense] = []
+    phrasal_verbs: list[PhrasalVerb] = []
+    idioms: list[Idiom] = []
