@@ -1,6 +1,5 @@
 from .senses.multiple import parse_multiply
 
-from typing import TypedDict
 from core.config import settings
 from aiohttp.client import ClientSession
 from bs4 import BeautifulSoup
