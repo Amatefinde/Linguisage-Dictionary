@@ -2,7 +2,7 @@ from typing import TypedDict
 import asyncio
 
 from core.config import settings
-from Dictionary import parse_page
+from Dictionary import get_dictionary_word_by_url
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -14,7 +14,8 @@ class Word(TypedDict):
 
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"}
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+}
 
 
 async def fetch_data(session, url):
@@ -40,8 +41,8 @@ async def main(link_to_list: str):
         words: list[Word] = get_links_to_words(row_html)
         tasks = []
         for word in words:  # type: Word
-            tasks.append(parse_page(session, word.get("link"), name=word.get("name")))
-        await asyncio.gather(*tasks)
+            tasks.append(get_dictionary_word_by_url(session, word.get("link")))
+        print(await asyncio.gather(*tasks))
 
 
 asyncio.run(main(settings.URL_TO_WORD_LIST))
