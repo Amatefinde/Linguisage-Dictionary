@@ -1,17 +1,18 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Literal
 
 
-class Meaning(BaseModel):
-    meaning: str
-    short_meaning: str | None
-    common_form = str | None
-    lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None
-    examples: list[str] | None
-    label: list[str] | None  # Example: Indian English, Transitive
+class SSense(BaseModel):
+    lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None = None
+    definition: str
+    short_cut: str | None = None
+    examples: list[str] | None = None
+    row_examples: list[str] | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
-class IdiomDefinition:
+class IdiomDefinition(BaseModel):
     definition: str
     examples: list[str] | None
 
@@ -27,6 +28,6 @@ class PhrasalVerb(BaseModel):
 
 class Word(BaseModel):
     word: str
-    meaning: list[Meaning] | None
+    meaning: list[SSense] | None
     phrasal_verbs: list[PhrasalVerb] | None
     idioms: list[Idiom] | None
