@@ -1,16 +1,6 @@
+from api_v1.word.schemas import SSense
+
 from bs4 import BeautifulSoup
-from typing import TypedDict
-
-
-class ParsedSense(TypedDict):
-    lvl: str | None
-    definition: str
-    examples: list[str | None]
-    row_examples: list[str | None]
-
-
-class FullParsedSense(ParsedSense):
-    short_cut: str
 
 
 def _check_multiply(soup: BeautifulSoup) -> None:
@@ -25,17 +15,17 @@ class Sense:
         self.sense = sense
         self.link = link
 
-        self.__parsed_sense = self.parse_sense()
+        self.__parsed_sense = SSense.model_validate(self.parse_sense())
 
-    def parse_sense(self):
-        parsed_sense: ParsedSense = {
+    def parse_sense(self) -> SSense:
+        parsed_sense = {
             "lvl": self._get_lvl(),
             "examples": self._get_examples(),
-            "row_examples": self._get_row_examples(),
+            "row_examples": self._get_row_examples(as_str=True),
             "definition": self._get_definition(),
         }
 
-        return parsed_sense
+        return SSense.model_validate(parsed_sense)
 
     @property
     def parsed_sense(self):
@@ -45,9 +35,14 @@ class Sense:
         if lvl := self.sense.get("cefr"):
             return lvl.upper()
 
-    def _get_row_examples(self):
+    def _get_row_examples(self, as_str=False) -> list[BeautifulSoup] | list[str]:
         try:
-            return self.sense.find("ul", class_="examples").find_all("li")
+            row_examples = self.sense.find("ul", class_="examples").find_all("li")
+            return (
+                [str(row_example) for row_example in row_examples]
+                if as_str
+                else row_examples
+            )
         except AttributeError:
             return []
 
@@ -71,10 +66,10 @@ class Sense:
 
 
 def _parse_senses(senses: list[BeautifulSoup], link):
-    parsed_senses: list[ParsedSense] = []
+    parsed_senses: list[SSense] = []
     for sense in senses:
-        parsed_sense: ParsedSense = Sense(sense, link).parsed_sense
-        parsed_senses.append(parsed_sense)
+        parsed_sense: SSense = Sense(sense, link).parsed_sense
+        parsed_senses.append(SSense.model_validate(parsed_sense))
     return parsed_senses
 
 
@@ -86,15 +81,15 @@ def _define_short_cut_name(short_cut_g: BeautifulSoup) -> str | None:
 
 
 def _parse_short_cuts(short_cuts: list[BeautifulSoup], link):
-    full_parsed_senses: list[FullParsedSense] = []
+    all_parsed_senses: list[SSense] = []
     for short_cut in short_cuts:  # type: BeautifulSoup
         short_cut_name: str = _define_short_cut_name(short_cut)
         senses: list[BeautifulSoup] | None = short_cut.find_all("li", class_="sense")
-        parsed_senses: list[ParsedSense] = _parse_senses(senses, link)
-        full_parsed_senses.extend(
-            [x | {"short_cut": short_cut_name} for x in parsed_senses]
-        )
-    return full_parsed_senses
+        parsed_senses: list[SSense] = _parse_senses(senses, link)
+        for parsed_sense in parsed_senses:
+            parsed_sense.short_cut = short_cut_name
+        all_parsed_senses.extend(parsed_senses)
+    return all_parsed_senses
 
 
 def parse_multiply(row_html: str, link):
@@ -104,6 +99,6 @@ def parse_multiply(row_html: str, link):
 
     senses: BeautifulSoup = soup.find("ol", class_="senses_multiple")
     if short_cuts := senses.find_all("span", class_="shcut-g"):
-        full_parsed_senses = _parse_short_cuts(short_cuts, link)
-        print(link, full_parsed_senses)
+        full_parsed_senses: list[SSense] = _parse_short_cuts(short_cuts, link)
+        print(full_parsed_senses)
         return full_parsed_senses
