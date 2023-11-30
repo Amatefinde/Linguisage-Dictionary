@@ -1,7 +1,3 @@
+from .parse_dictionary_page import main as get_dictionary_word_by_url
 
-from .parse_page import main as parse_page
-
-__all__ = [parse_page]
-
-
-
+__all__ = [get_dictionary_word_by_url]
