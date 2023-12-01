@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from core.schemas import SSense
+import unicodedata
 
 
 class Sense:
@@ -34,18 +35,10 @@ class Sense:
         if lvl := self.sense.get("cefr") or self.sense.get("fkcefr"):
             return lvl.upper()
 
-    def _get_row_examples(
-        self, as_str=False
-    ) -> list[BeautifulSoup] | list[str]:
+    def _get_row_examples(self, as_str=False) -> list[BeautifulSoup] | list[str]:
         try:
-            row_examples = self.sense.find("ul", class_="examples").find_all(
-                "li"
-            )
-            return (
-                [str(row_example) for row_example in row_examples]
-                if as_str
-                else row_examples
-            )
+            row_examples = self.sense.find("ul", class_="examples").find_all("li")
+            return [str(row_example) for row_example in row_examples] if as_str else row_examples
         except AttributeError:
             return []
 
@@ -57,12 +50,16 @@ class Sense:
             if not (example := row_example.find("span", class_="x")):
                 if not (example := row_example.find("span", class_="unx")):
                     example = row_example
-            examples.append(example.text)
+            examples.append(self.normalize(example.text))
 
         return examples
 
+    @staticmethod
+    def normalize(string: str) -> str:
+        return unicodedata.normalize("NFKD", string)
+
     def _get_definition(self):
         try:
-            return self.sense.find("span", class_="def").text
+            return self.normalize(self.sense.find("span", class_="def").text)
         except AttributeError:
-            return self.sense.text
+            return self.normalize(self.sense.text)
