@@ -8,5 +8,6 @@ if TYPE_CHECKING:
 
 
 class Example(Base):
+    example: Mapped[str]
     sense: Mapped["Sense"] = relationship(back_populates="examples")
     sense_id: Mapped["int"] = mapped_column(ForeignKey("sense.id"))

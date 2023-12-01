@@ -9,5 +9,6 @@ if TYPE_CHECKING:
 
 class RowExample(Base):
     __tablename__ = "row_example"
+    row_example: Mapped[str]
     sense: Mapped["Sense"] = relationship(back_populates="row_examples")
     sense_id: Mapped["int"] = mapped_column(ForeignKey("sense.id"))
