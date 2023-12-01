@@ -35,6 +35,8 @@ def define_download_path_for_image(word: SWord, sense: SSense, url: str) -> str:
 
 
 def _save_images(image: bytes, filepath: str):
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
     with open(filepath, "wb") as file:
         file.write(image)
 
@@ -61,9 +63,9 @@ async def get_word(session: ClientSession, dictionary_word_link: str):
     word: SWord = await get_dictionary_word_by_url(session, dictionary_word_link)
     await set_images_for_word(session, word)
     print(word)
-    async with db_helper.session_factory() as db_session:
-        async with db_session.begin():
-            await word_crud.add(db_session, word)
+    # async with db_helper.session_factory() as db_session:
+    #     async with db_session.begin():
+    #         await word_crud.add(db_session, word)
 
     return dictionary_word_link
 
