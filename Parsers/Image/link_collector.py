@@ -1,11 +1,14 @@
 import cloudscraper
 import concurrent.futures
+from random import choice
 
-
-scrapper = cloudscraper.create_scraper(
-    # delay=10,
-    browser={"browser": "firefox", "platform": "android", "desktop": False},
-)
+scrappers = []
+for browser in ["firefox", "chrome"]:
+    for platform in ["windows", "linux", "android"]:
+        scrapper = cloudscraper.create_scraper(
+            browser={"browser": browser, "platform": platform}
+        )
+        scrappers.append(scrapper)
 
 
 def collect_img_links_from_json(data: dict) -> list[str]:
@@ -22,6 +25,7 @@ def fetch_url(
     url: str = "https://quizlet.com/webapi/3.2/images/search",
 ):
     params = {"query": query, "perPage": amount}
+    scrapper = choice(scrappers)
     response = scrapper.get(url, params=params)
     if response.status_code != 200:
         print(response)
