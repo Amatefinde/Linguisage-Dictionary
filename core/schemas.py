@@ -13,22 +13,27 @@ class SSense(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class IdiomDefinition(BaseModel):
+class SIdiomDefinition(BaseModel):
     definition: str
     examples: list[str] | None
 
 
-class Idiom(BaseModel):
+class SIdiom(BaseModel):
     idiom: str
-    definitions: list[IdiomDefinition]
+    definitions: list[SIdiomDefinition]
 
 
-class PhrasalVerb(BaseModel):
+class SPhrasalVerb(BaseModel):
     pass  # todo
 
 
 class SWord(BaseModel):
     word: str
     senses: list[SSense] = []
-    phrasal_verbs: list[PhrasalVerb] = []
-    idioms: list[Idiom] = []
+    phrasal_verbs: list[SPhrasalVerb] = []
+    idioms: list[SIdiom] = []
+
+
+class SWordDictionaryLink(BaseModel):
+    word: str
+    link: str
