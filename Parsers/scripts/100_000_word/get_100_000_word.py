@@ -11,7 +11,7 @@ from utils import split_on_batches
 
 
 def clear_words(words: list[str]) -> list[str]:
-    words = map(lambda x: x.strip(), words)
+    words = map(lambda x: x.strip().lower(), words)
     words = filter(lambda x: x[0] != "#", words)
     return list(words)
 
@@ -51,7 +51,7 @@ async def main():
         aliases = file.readlines()
         aliases = clear_words(aliases)
     async with get_session() as session:
-        for alias_batch in split_on_batches(aliases, 30):
+        for alias_batch in split_on_batches(aliases, 10):
             await asyncio.gather(*[set_alias_to_word(session, alias) for alias in alias_batch])
 
     print(aliases[:100], sep="\n")
