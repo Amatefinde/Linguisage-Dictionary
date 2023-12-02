@@ -1,4 +1,4 @@
-from core.database.models import Word, Image, Example, Sense, RowExample
+from core.database.models import Word, Image, Example, Sense, RowExample, Alias
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from core.schemas import SWord, SSense
@@ -59,7 +59,16 @@ async def add(
     session: AsyncSession,
     word: SWord,
 ):
-    db_word = (await get_word_by_name(session, word.word)) or Word(word=word.word)
-    db_word.senses = get_db_senses_from_s_word(word)
-    session.add(db_word)
+    db_word: Word = await get_word_by_name(session, word.word)
+    if not db_word:
+        db_word = Word(word=word.word)
+        db_word.aliases = [Alias(alias=word.word)]
+        db_word.senses = get_db_senses_from_s_word(word)
+        session.add(db_word)
+    else:
+        senses: list[Sense] = get_db_senses_from_s_word(word)
+        for sense in senses:
+            sense.word_id = db_word.id
+            session.add(sense)
+
     await session.commit()
