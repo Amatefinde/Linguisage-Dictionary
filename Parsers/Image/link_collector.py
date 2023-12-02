@@ -1,3 +1,5 @@
+import time
+
 import cloudscraper
 import concurrent.futures
 from random import choice
@@ -5,9 +7,7 @@ from random import choice
 scrappers = []
 for browser in ["firefox", "chrome"]:
     for platform in ["windows", "linux", "android"]:
-        scrapper = cloudscraper.create_scraper(
-            browser={"browser": browser, "platform": platform}
-        )
+        scrapper = cloudscraper.create_scraper(browser={"browser": browser, "platform": platform})
         scrappers.append(scrapper)
 
 
@@ -29,6 +29,8 @@ def fetch_url(
     response = scrapper.get(url, params=params)
     if response.status_code != 200:
         print(response)
+        time.sleep(5)
+        response = scrapper.get(url, params=params)
     data = response.json()
     return collect_img_links_from_json(data)
 
