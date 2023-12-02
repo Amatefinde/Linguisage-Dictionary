@@ -57,4 +57,4 @@ async def main(link_to_list: str, start_word: str | None = None):
     print("end")
 
 
-asyncio.run(main(settings.URL_TO_WORD_LIST, "chicken"))
+asyncio.run(main(settings.URL_TO_WORD_LIST, "factory"))
