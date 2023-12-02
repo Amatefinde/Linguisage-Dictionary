@@ -9,6 +9,15 @@ router = APIRouter(prefix="/words", tags=["Words"])
 
 @router.get("/find_word_and_save_to_db")
 async def find_word_and_save_to_db(
-    word: str, session: AsyncSession = Depends(db_helper.session_dependency)
+    word: str,
+    session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.get_word_by_id(session, 1)
+    return
+
+
+@router.get("/words")
+async def get_by_alias(
+    alias: str,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.get_all_word_data(session, alias)
