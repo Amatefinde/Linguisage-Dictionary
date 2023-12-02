@@ -27,8 +27,9 @@ def define_download_path_for_image(word: SWord, sense: SSense, url: str) -> str:
     clear_definition = sense.definition.replace(" ", "").replace("/", "_").replace("\\", "_")
     while True:
         static_path = join_url(settings.static_path, "/word_images/")
-        file_name = f"{word.word}__{clear_definition}__{idx}.{extension}"
+        file_name = f"{word.word}__{clear_definition}"[:50] + f"__{idx}.{extension}"
         new_file_path = join_url(static_path, file_name)
+        print(new_file_path)
         if not os.path.exists(new_file_path):
             return new_file_path
         idx += 1
