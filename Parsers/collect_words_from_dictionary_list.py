@@ -9,21 +9,10 @@ from core.config import settings
 import aiohttp
 from aiohttp.client import ClientTimeout
 from bs4 import BeautifulSoup
-
+from utils.special import _cut_word_link_list
 from utils import split_on_batches
 from Parsers.word_collector import get_word
-
-
-class Word(TypedDict):
-    name: str
-    link: str
-
-
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-}
-
-session_timeout = ClientTimeout(6 * 60 * 60)
+from core.schemas import SWordDictionaryLink
 
 
 async def fetch_data(session: ClientSession, url: str):
@@ -31,16 +20,16 @@ async def fetch_data(session: ClientSession, url: str):
         return await response.text()
 
 
-def get_links_to_words(row_html: str) -> list[Word]:
+def get_links_to_words(row_html: str) -> list[SWordDictionaryLink]:
     soup = BeautifulSoup(row_html, "lxml")
     parent_obj = soup.find("div", id="wordlistsContentPanel")
     row_words: list = parent_obj.find_all("li")
-    words = []
+    word_links = []
     for row_word in row_words:
         row_word = row_word.find("a")
-        word: Word = {"name": row_word.text, "link": row_word["href"]}
-        words.append(word)
-    return words
+        word_link = SWordDictionaryLink(word=row_word.text, link=row_word["href"])
+        word_links.append(word_link)
+    return word_links
 
 
 async def get_aiohttp_session():
@@ -57,10 +46,13 @@ async def get_aiohttp_session():
 async def main(link_to_list: str, start_word: str | None = None):
     async with await get_aiohttp_session() as session:
         row_html = await fetch_data(session, link_to_list)
-        words: list[Word] = get_links_to_words(row_html)
+        word_links: list[SWordDictionaryLink] = get_links_to_words(row_html)
+        word_links_from_start_word: list[SWordDictionaryLink] = _cut_word_link_list(
+            word_links, start_word
+        )
         tasks = []
-        for word in words:  # type: Word
-            tasks.append(get_word(session, word.get("link")))
+        for word_link in word_links_from_start_word:  # type: SWordDictionaryLink
+            tasks.append(get_word(session, word_link.link))
         task_by_batches = split_on_batches(
             tasks,
         )
@@ -69,4 +61,4 @@ async def main(link_to_list: str, start_word: str | None = None):
     print("end")
 
 
-asyncio.run(main(settings.URL_TO_WORD_LIST))
+asyncio.run(main(settings.URL_TO_WORD_LIST, "chicken"))
