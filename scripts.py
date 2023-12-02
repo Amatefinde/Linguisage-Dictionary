@@ -1,1 +1,1 @@
-import Parsers.collect_words_from_dictionary_list
+import Parsers.scripts.collect_words_from_dictionary_list
