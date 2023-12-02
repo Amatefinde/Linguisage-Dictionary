@@ -1,6 +1,6 @@
 import aiohttp
 from aiohttp import TCPConnector
-from aiohttp.client_exceptions import ClientOSError
+from aiohttp.client_exceptions import ClientError
 from Parsers.Dictionary import get_dictionary_word_by_url
 from Parsers.Image import get_links_by_query_list
 from core.config import settings
@@ -47,9 +47,9 @@ async def try_to_get_image(session: ClientSession, urls: Iterable[str]) -> tuple
         try:
             images = await asyncio.gather(*[fetch_image(session, url) for url in urls])
             return images
-        except ClientOSError:
+        except ClientError:
             print(f"Attempt {attempt} unsuccessful")
-    raise ClientOSError("To much attempts without result")
+    raise ClientError("To much attempts without result")
 
 
 async def download_images_for_sense(
