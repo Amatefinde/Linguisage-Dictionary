@@ -50,14 +50,10 @@ async def main(link_to_list: str, start_word: str | None = None):
         word_links_from_start_word: list[SWordDictionaryLink] = _cut_word_link_list(
             word_links, start_word
         )
-        tasks = []
+
         for word_link in word_links_from_start_word:  # type: SWordDictionaryLink
-            tasks.append(get_word(session, word_link.link))
-        task_by_batches = split_on_batches(
-            tasks,
-        )
-        for batch in task_by_batches:
-            print(await asyncio.gather(*batch))
+            await get_word(session, word_link.link)
+
     print("end")
 
 
