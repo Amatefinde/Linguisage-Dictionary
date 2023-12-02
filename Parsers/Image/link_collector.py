@@ -29,7 +29,7 @@ def fetch_url(
     response = scrapper.get(url, params=params)
     if response.status_code != 200:
         print(response)
-        time.sleep(5)
+        time.sleep(30)
         response = scrapper.get(url, params=params)
     data = response.json()
     return collect_img_links_from_json(data)
