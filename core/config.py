@@ -1,4 +1,3 @@
-from aiohttp import TCPConnector, ClientTimeout
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -19,11 +18,12 @@ class Settings(BaseSettings):
 
     api_v1_prefix: str = "/api/v1"
 
-    # content_manager_url: str = os.environ.get("CONTENT_MANAGER_URL")
-    # neural_module_url: str = os.environ.get("NEURAL_MODULE_URL")
     URL_TO_WORD_LIST: str = os.environ.get("URL_TO_WORD_LIST")
     DICTIONARY_BASE_URL: str = os.environ.get("DICTIONARY_BASE_URL")
     static_path: str = os.environ.get("STATIC_PATH")
+    NEURAL_MICROSERVICE_IP: str
+    SERVER_HOST: str
+    SERVER_PORT: str
 
 
 settings = Settings()
