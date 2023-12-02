@@ -14,6 +14,9 @@ class Alias(Base):
     word: Mapped["Word"] = relationship(back_populates="aliases")
     word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
 
+    def __repr__(self):
+        return f"Alias: {self.alias}, Word: {self.word}"
+
 
 class Word(Base):
     word: Mapped[str]
