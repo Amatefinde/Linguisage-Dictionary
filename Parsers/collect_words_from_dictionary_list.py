@@ -2,16 +2,16 @@ from typing import TypedDict
 import asyncio
 
 from aiohttp import TCPConnector
+from aiohttp.client import ClientSession
 
 from core.config import settings
-from Dictionary import get_dictionary_word_by_url
 
 import aiohttp
 from aiohttp.client import ClientTimeout
 from bs4 import BeautifulSoup
 
 from utils import split_on_batches
-from word_collector import get_word
+from Parsers.word_collector import get_word
 
 
 class Word(TypedDict):
@@ -26,7 +26,7 @@ headers = {
 session_timeout = ClientTimeout(6 * 60 * 60)
 
 
-async def fetch_data(session, url):
+async def fetch_data(session: ClientSession, url: str):
     async with session.get(url) as response:
         return await response.text()
 
@@ -43,13 +43,19 @@ def get_links_to_words(row_html: str) -> list[Word]:
     return words
 
 
-async def main(link_to_list: str):
-    connector = TCPConnector(force_close=True)
-    async with aiohttp.ClientSession(
-        headers=headers,
-        timeout=session_timeout,
-        connector=connector,
-    ) as session:
+async def get_aiohttp_session():
+    aiohttp_session_config: dict = {
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+        },
+        "connector": TCPConnector(force_close=True),
+        "timeout": ClientTimeout(6 * 60 * 60),
+    }
+    return aiohttp.ClientSession(**aiohttp_session_config)
+
+
+async def main(link_to_list: str, start_word: str | None = None):
+    async with await get_aiohttp_session() as session:
         row_html = await fetch_data(session, link_to_list)
         words: list[Word] = get_links_to_words(row_html)
         tasks = []
