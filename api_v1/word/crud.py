@@ -59,7 +59,7 @@ async def add(
     session: AsyncSession,
     word: SWord,
 ):
-    db_word = Word(word=word.word)
+    db_word = (await get_word_by_name(session, word.word)) or Word(word=word.word)
     db_word.senses = get_db_senses_from_s_word(word)
     session.add(db_word)
     await session.commit()
