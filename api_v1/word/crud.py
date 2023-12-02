@@ -4,7 +4,7 @@ from core.database.models import Word, Image, Example, Sense, RowExample, Alias
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from core.schemas import SWord, SSense
-from .schemas import WordDTO
+from .schemas import WordDTO, SenseDTO, ImageDTO
 
 
 async def get_word_by_id(
@@ -87,11 +87,11 @@ async def get_all_word_data(session: AsyncSession, alias: str):
     )
     db_response = await session.execute(stmt)
     result = db_response.scalar()
-
-    return WordDTO.model_validate(
-        result.word,
-        from_attributes=True,
-    )
+    if result:
+        return WordDTO.model_validate(
+            result.word,
+            from_attributes=True,
+        )
 
 
 async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Alias | None:
@@ -105,3 +105,22 @@ async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Ali
         session.add(db_alias)
         await session.commit()
         return db_alias
+
+
+async def get_sense_with_word_and_images_by_sense_id(
+    session: AsyncSession, sense_id: int
+) -> SenseDTO | None:
+    stmt = (
+        select(Sense)
+        .where(Sense.id == sense_id)
+        .options(selectinload(Sense.images))
+        .options(joinedload(Sense.word))
+    )
+    sense_db = await session.scalar(stmt)
+    if sense_db:
+        # return sense_db
+        return sense_db
+
+
+async def image_by_id(session: AsyncSession, image_id: int) -> Image | None:
+    return await session.get(Image, image_id)

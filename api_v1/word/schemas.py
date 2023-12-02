@@ -15,7 +15,7 @@ class RowExamplesDTO(BaseDTO):
     row_example: str
 
 
-class Image(BaseDTO):
+class ImageDTO(BaseDTO):
     id: int
     img: str
 
@@ -27,7 +27,7 @@ class SenseDTO(BaseDTO):
     definition: str
     examples: list[ExamplesDTO] = None
     row_examples: list[RowExamplesDTO] = None
-    images: list[Image] = None
+    images: list[ImageDTO] = None
 
 
 class WordDTO(BaseDTO):
