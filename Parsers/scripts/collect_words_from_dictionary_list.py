@@ -1,4 +1,3 @@
-from typing import TypedDict
 import asyncio
 
 from aiohttp import TCPConnector
@@ -10,7 +9,6 @@ import aiohttp
 from aiohttp.client import ClientTimeout
 from bs4 import BeautifulSoup
 from utils.special import _cut_word_link_list
-from utils import split_on_batches
 from Parsers.word_collector import get_word
 from core.schemas import SWordDictionaryLink
 
