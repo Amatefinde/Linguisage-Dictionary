@@ -56,7 +56,8 @@ class Sense:
 
     @staticmethod
     def normalize(string: str) -> str:
-        return unicodedata.normalize("NFKD", string)
+        normalized = unicodedata.normalize("NFKC", string)
+        return normalized.replace("\u200b", "")
 
     def _get_definition(self):
         try:
