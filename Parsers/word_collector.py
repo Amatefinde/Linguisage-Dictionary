@@ -29,7 +29,6 @@ def define_download_path_for_image(word: SWord, sense: SSense, url: str) -> str:
         static_path = join_url(settings.static_path, "/word_images/")
         file_name = f"{word.word}__{clear_definition}"[:50] + f"__{idx}.{extension}"
         new_file_path = join_url(static_path, file_name)
-        print(new_file_path)
         if not os.path.exists(new_file_path):
             return new_file_path
         idx += 1
@@ -63,10 +62,10 @@ async def set_images_for_word(session: ClientSession, word: SWord):
 async def get_word(session: ClientSession, dictionary_word_link: str):
     word: SWord = await get_dictionary_word_by_url(session, dictionary_word_link)
     await set_images_for_word(session, word)
-    print(word)
-    # async with db_helper.session_factory() as db_session:
-    #     async with db_session.begin():
-    #         await word_crud.add(db_session, word)
+    print(word.word)
+    async with db_helper.session_factory() as db_session:
+        async with db_session.begin():
+            await word_crud.add(db_session, word)
 
     return dictionary_word_link
 
