@@ -1,7 +1,10 @@
+from sqlalchemy.orm import joinedload, selectinload
+
 from core.database.models import Word, Image, Example, Sense, RowExample, Alias
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from core.schemas import SWord, SSense
+from .schemas import WordDTO
 
 
 async def get_word_by_id(
@@ -72,3 +75,33 @@ async def add(
             session.add(sense)
 
     await session.commit()
+
+
+async def get_all_word_data(session: AsyncSession, alias: str):
+    stmt = (
+        select(Alias)
+        .where(Alias.alias == alias)
+        .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.examples))
+        .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.row_examples))
+        .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.images))
+    )
+    db_response = await session.execute(stmt)
+    result = db_response.scalar()
+
+    return WordDTO.model_validate(
+        result.word,
+        from_attributes=True,
+    )
+
+
+async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Alias | None:
+    stmt = select(Alias).where(Alias.alias == alias)
+    db_alias = await session.scalar(stmt)
+    db_word = await get_word_by_name(session, word)
+    if not db_word:
+        return
+    if not db_alias:
+        db_alias = Alias(alias=alias, word=db_word)
+        session.add(db_alias)
+        await session.commit()
+        return db_alias
