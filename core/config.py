@@ -7,16 +7,6 @@ import os
 load_dotenv()
 
 
-class Parser:
-    aiohttp_session_config: dict = {
-        "headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-        },
-        "connector": TCPConnector(force_close=True),
-        "timeout": ClientTimeout(6 * 60 * 60),
-    }
-
-
 class Settings(BaseSettings):
     DB_HOST: str = os.environ.get("DB_HOST")
     DB_PORT: str = os.environ.get("DB_PORT")
@@ -34,8 +24,6 @@ class Settings(BaseSettings):
     URL_TO_WORD_LIST: str = os.environ.get("URL_TO_WORD_LIST")
     DICTIONARY_BASE_URL: str = os.environ.get("DICTIONARY_BASE_URL")
     static_path: str = os.environ.get("STATIC_PATH")
-
-    parser: Parser = Parser()
 
 
 settings = Settings()
