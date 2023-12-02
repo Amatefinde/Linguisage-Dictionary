@@ -45,7 +45,7 @@ async def try_to_get_image(session: ClientSession, urls: Iterable[str]) -> tuple
     attempt = 1
     while attempt < 4:
         try:
-            images: tuple[str, bytes] = await asyncio.gather(*[fetch_image(session, url) for url in urls])
+            images = await asyncio.gather(*[fetch_image(session, url) for url in urls])
             return images
         except ClientOSError:
             print(f"Attempt {attempt} unsuccessful")
