@@ -1,6 +1,6 @@
 import aiohttp
 from aiohttp import TCPConnector
-
+from aiohttp.client_exceptions import ClientOSError
 from Parsers.Dictionary import get_dictionary_word_by_url
 from Parsers.Image import get_links_by_query_list
 from core.config import settings
@@ -41,10 +41,21 @@ def _save_images(image: bytes, filepath: str):
         file.write(image)
 
 
+async def try_to_get_image(session: ClientSession, urls: Iterable[str]) -> tuple[str, bytes]:
+    attempt = 1
+    while attempt < 4:
+        try:
+            images: tuple[str, bytes] = await asyncio.gather(*[fetch_image(session, url) for url in urls])
+            return images
+        except ClientOSError:
+            print(f"Attempt {attempt} unsuccessful")
+    raise ClientOSError("To much attempts without result")
+
+
 async def download_images_for_sense(
     session: ClientSession, word: SWord, sense: SSense, urls: Iterable[str]
 ):
-    images: tuple[str, bytes] = await asyncio.gather(*[fetch_image(session, url) for url in urls])
+    images: tuple[str, bytes] = await try_to_get_image(session, urls)
     for url, image in images:
         file_path = define_download_path_for_image(word, sense, url)
         _save_images(image, file_path)
