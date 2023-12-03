@@ -113,12 +113,14 @@ async def get_sense_with_word_and_images_by_sense_id(
         select(Sense)
         .where(Sense.id == sense_id)
         .options(selectinload(Sense.images))
+        .options(selectinload(Sense.examples))
+        .options(selectinload(Sense.row_examples))
         .options(joinedload(Sense.word))
     )
     sense_db = await session.scalar(stmt)
     if sense_db:
         # return sense_db
-        return sense_db
+        return SenseDTO.model_validate(sense_db)
 
 
 async def get_image_by_id(session: AsyncSession, image_id: int) -> ImageDTO | None:
