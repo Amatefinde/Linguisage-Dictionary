@@ -5,7 +5,11 @@ from random import choice
 scrappers = []
 for browser in ["firefox", "chrome"]:
     for platform in ["windows", "linux", "android"]:
-        scrapper = cloudscraper.create_scraper(browser={"browser": browser, "platform": platform})
+        scrapper = cloudscraper.create_scraper(
+            browser={"browser": browser, "platform": platform},
+            delay=2,
+            interpreter="nodejs",
+        )
         scrappers.append(scrapper)
 
 
