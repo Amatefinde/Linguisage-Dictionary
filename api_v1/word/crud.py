@@ -90,10 +90,7 @@ async def get_all_word_data(session: AsyncSession, alias: str):
     db_response = await session.execute(stmt)
     result = db_response.scalar()
     if result:
-        return WordDTO.model_validate(
-            result.word,
-            from_attributes=True,
-        )
+        return WordDTO.model_validate(result.word)
 
 
 async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Alias | None:
@@ -124,5 +121,7 @@ async def get_sense_with_word_and_images_by_sense_id(
         return sense_db
 
 
-async def image_by_id(session: AsyncSession, image_id: int) -> Image | None:
-    return await session.get(Image, image_id)
+async def get_image_by_id(session: AsyncSession, image_id: int) -> ImageDTO | None:
+    image_db = await session.get(Image, image_id)
+    if image_db:
+        return ImageDTO.model_validate(image_db)
