@@ -3,11 +3,12 @@ from core.database import db_helper
 from . import crud
 from sqlalchemy.ext.asyncio import AsyncSession
 from Parsers.word_collector import search_by_query_and_save_to_db
+from .schemas import WordDTO, ImageDTO
 
 router = APIRouter(prefix="/words", tags=["Words"])
 
 
-@router.get("/alias")
+@router.get("/alias", response_model=WordDTO)
 async def get_by_alias(
     alias: str,
     download_if_not_found: bool = False,
@@ -30,3 +31,14 @@ async def get_sense_by_id(
 ):
     sense = await crud.get_sense_with_word_and_images_by_sense_id(session, sense_id)
     return sense
+
+
+@router.get("/image/{image_id}", response_model=ImageDTO)
+async def get_image_by_id(
+    image_id: int,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    image = await crud.get_image_by_id(session, image_id)
+    if image:
+        return image
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
