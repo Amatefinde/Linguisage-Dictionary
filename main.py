@@ -4,7 +4,9 @@ from api_v1 import router as api_v1_router
 from core.config import settings
 
 
-app = FastAPI()
+app = FastAPI(
+    title=settings.MICROSERVICE_NAME,
+)
 app.include_router(api_v1_router)
 
 
