@@ -1,18 +1,37 @@
+from core.config import settings
+from core.database.models import Word
+from core.schemas import SWord, SSense
+from core.database import db_helper
+
+import api_v1.word.crud as word_crud
+
+from Parsers.Image import get_links_by_query_list
+from Parsers.Dictionary import get_dictionary_word_by_url
+
+from urllib.parse import urlparse
 import aiohttp
 from aiohttp import TCPConnector
 from aiohttp.client_exceptions import ClientError
-from Parsers.Dictionary import get_dictionary_word_by_url
-from Parsers.Image import get_links_by_query_list
-from core.config import settings
-from core.schemas import SWord, SSense
-import api_v1.word.crud as word_crud
 import os
 from utils import join_url
 from typing import Iterable
-from core.database import db_helper
 
 import asyncio
 from aiohttp.client import ClientSession, ClientTimeout
+
+search_endpoint_url = "/search/english"
+url = join_url(settings.DICTIONARY_BASE_URL, search_endpoint_url) + "/"
+
+
+def get_aiohttp_session():
+    aiohttp_session_config: dict = {
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+        },
+        "connector": TCPConnector(force_close=True),
+        "timeout": ClientTimeout(6 * 60 * 60),
+    }
+    return aiohttp.ClientSession(**aiohttp_session_config)
 
 
 async def fetch_image(session: ClientSession, url: str) -> tuple[str, bytes]:
@@ -70,29 +89,39 @@ async def set_images_for_word(session: ClientSession, word: SWord):
         await download_images_for_sense(session, word, sense, all_sense_urls)
 
 
-async def get_word(session: ClientSession, dictionary_word_link: str):
+async def get_word_by_url_and_save(session: ClientSession, dictionary_word_link: str):
     word: SWord = await get_dictionary_word_by_url(session, dictionary_word_link)
     await set_images_for_word(session, word)
-    print(word.word)
+
     async with db_helper.session_factory() as db_session:
         async with db_session.begin():
-            await word_crud.add(db_session, word)
+            db_word = await word_crud.add(db_session, word)
+    print("saved to db:", word.word)
 
-    return dictionary_word_link
+    return db_word
 
 
-async def main():
-    aiohttp_session_config: dict = {
-        "headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-        },
-        "connector": TCPConnector(force_close=True),
-        "timeout": ClientTimeout(6 * 60 * 60),
-    }
+async def get_url_by_query(session: ClientSession, query: str) -> str | None:
+    params = {"q": query}
+    async with session.get(url, params=params) as response:
+        row_html: str = await response.text()
+        if "headword" in row_html:
+            return urlparse(str(response.url)).path
 
-    async with aiohttp.ClientSession(**aiohttp_session_config) as session:
-        await get_word(session, r"/definition/english/accident")
+
+async def search_by_query_and_save_to_db(query: str) -> Word | None:
+    async with get_aiohttp_session() as session:
+        word_dictionary_url = await get_url_by_query(session, query)
+        if word_dictionary_url:
+            return await get_word_by_url_and_save(session, word_dictionary_url)
+
+
+#########################################################################
+
+
+async def main(word: str | None):
+    print(await search_by_query_and_save_to_db(word))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main("wadawdawdas2"))
