@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     NEURAL_MICROSERVICE_IP: str
     SERVER_HOST: str
     SERVER_PORT: str
+    MICROSERVICE_NAME: str
 
 
 settings = Settings()
