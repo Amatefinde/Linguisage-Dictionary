@@ -1,3 +1,6 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api_v1.word.schemas import WordDTO
 from core.config import settings
 from core.database.models import Word
 from core.schemas import SWord, SSense
@@ -89,13 +92,12 @@ async def set_images_for_word(session: ClientSession, word: SWord):
         await download_images_for_sense(session, word, sense, all_sense_urls)
 
 
-async def get_word_by_url_and_save(session: ClientSession, dictionary_word_link: str):
+async def get_word_by_url_and_save(
+    session: ClientSession, db_session: AsyncSession, dictionary_word_link: str
+):
     word: SWord = await get_dictionary_word_by_url(session, dictionary_word_link)
     await set_images_for_word(session, word)
-
-    async with db_helper.session_factory() as db_session:
-        async with db_session.begin():
-            db_word = await word_crud.add(db_session, word)
+    db_word = await word_crud.add(db_session, word)
     print("saved to db:", word.word)
 
     return db_word
@@ -109,11 +111,17 @@ async def get_url_by_query(session: ClientSession, query: str) -> str | None:
             return urlparse(str(response.url)).path
 
 
-async def search_by_query_and_save_to_db(query: str) -> Word | None:
+async def search_by_query_and_save_to_db(db_session: AsyncSession, query: str) -> WordDTO | None:
     async with get_aiohttp_session() as session:
         word_dictionary_url = await get_url_by_query(session, query)
         if word_dictionary_url:
-            return await get_word_by_url_and_save(session, word_dictionary_url)
+            db_word = await get_word_by_url_and_save(session, db_session, word_dictionary_url)
+
+            word_dto = WordDTO.model_validate(
+                db_word,
+                from_attributes=True,
+            )
+            return word_dto
 
 
 #########################################################################
