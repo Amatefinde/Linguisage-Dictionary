@@ -2,27 +2,24 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from core.database import db_helper
 from . import crud
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from Parsers.word_collector import search_by_query_and_save_to_db
 
 router = APIRouter(prefix="/words", tags=["Words"])
-
-
-@router.get("/find_word_and_save_to_db")
-async def find_word_and_save_to_db(
-    word: str,
-    session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    return
 
 
 @router.get("/alias")
 async def get_by_alias(
     alias: str,
+    download_if_not_found: bool = False,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     word_dto = await crud.get_all_word_data(session, alias)
     if word_dto:
         return word_dto
+    elif download_if_not_found:
+        word_dto = await search_by_query_and_save_to_db(alias)
+        if word_dto:
+            return word_dto
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
