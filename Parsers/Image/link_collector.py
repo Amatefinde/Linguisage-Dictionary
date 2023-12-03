@@ -1,5 +1,3 @@
-import time
-
 import cloudscraper
 import concurrent.futures
 from random import choice
@@ -29,10 +27,13 @@ def fetch_url(
     response = scrapper.get(url, params=params)
     if response.status_code != 200:
         print(response)
-        time.sleep(30)
+        scrapper = choice(list(set(scrappers) - set(scrapper)))
         response = scrapper.get(url, params=params)
-    data = response.json()
-    return collect_img_links_from_json(data)
+        data = response.json()
+        return collect_img_links_from_json(data)
+    else:
+        data = response.json()
+        return collect_img_links_from_json(data)
 
 
 def get_links_by_query_list(words: list[str]):
