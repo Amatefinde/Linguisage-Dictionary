@@ -1,6 +1,7 @@
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
+from core.config import settings
 
 
 class BaseDTO(BaseModel):
@@ -18,6 +19,10 @@ class RowExamplesDTO(BaseDTO):
 class ImageDTO(BaseDTO):
     id: int
     img: str
+
+    @field_validator("img", mode="before")
+    def add_prefix(cls, value):
+        return f"{settings.SERVER_HOST}:{settings.SERVER_PORT}/{value}"
 
 
 class SenseDTO(BaseDTO):
