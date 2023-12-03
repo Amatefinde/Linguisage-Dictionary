@@ -10,6 +10,6 @@ app.include_router(api_v1_router)
 
 app.mount(
     f"/static/word_images",
-    StaticFiles(directory=f"{settings.static_path}/word_images"),
+    StaticFiles(directory=f"./static/word_images"),
     name="static_images",
 )
