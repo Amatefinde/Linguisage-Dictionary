@@ -1,9 +1,15 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from api_v1 import router as api_v1_router
+from core.config import settings
+
 
 app = FastAPI()
 app.include_router(api_v1_router)
 
 
-# app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount(
+    f"/static/word_images",
+    StaticFiles(directory=f"{settings.static_path}/word_images"),
+    name="static_images",
+)
