@@ -9,7 +9,7 @@ import aiohttp
 from aiohttp.client import ClientTimeout
 from bs4 import BeautifulSoup
 from utils.special import _cut_word_link_list
-from Parsers.word_collector import get_word
+from Parsers.word_collector import get_word_by_url_and_save
 from core.schemas import SWordDictionaryLink
 
 
@@ -50,7 +50,7 @@ async def main(link_to_list: str, start_word: str | None = None):
         )
 
         for word_link in word_links_from_start_word:  # type: SWordDictionaryLink
-            await get_word(session, word_link.link)
+            await get_word_by_url_and_save(session, word_link.link)
 
     print("end")
 
