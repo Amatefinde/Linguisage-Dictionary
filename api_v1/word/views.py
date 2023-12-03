@@ -11,7 +11,7 @@ router = APIRouter(prefix="/words", tags=["Words"])
 @router.get("/alias", response_model=WordDTO)
 async def get_by_alias(
     alias: str,
-    download_if_not_found: bool = False,
+    download_if_not_found: bool = True,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     word_dto = await crud.get_all_word_data(session, alias)
