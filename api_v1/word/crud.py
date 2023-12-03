@@ -61,20 +61,22 @@ def get_db_senses_from_s_word(word: SWord) -> list[Sense]:
 async def add(
     session: AsyncSession,
     word: SWord,
-):
+) -> Word | None:
     db_word: Word = await get_word_by_name(session, word.word)
+
     if not db_word:
         db_word = Word(word=word.word)
         db_word.aliases = [Alias(alias=word.word)]
         db_word.senses = get_db_senses_from_s_word(word)
         session.add(db_word)
+        await session.commit()
+        return db_word
     else:
         senses: list[Sense] = get_db_senses_from_s_word(word)
         for sense in senses:
             sense.word_id = db_word.id
             session.add(sense)
-
-    await session.commit()
+            await session.commit()
 
 
 async def get_all_word_data(session: AsyncSession, alias: str):
