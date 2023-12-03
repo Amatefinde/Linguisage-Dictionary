@@ -111,6 +111,14 @@ async def get_url_by_query(session: ClientSession, query: str) -> str | None:
             return urlparse(str(response.url)).path
 
 
+async def get_word_by_alias(alias: str) -> str:
+    async with get_aiohttp_session() as session:
+        word_url = await get_url_by_query(session, alias)
+        word = word_url.split("/")[-1]
+        word = word.split("_")[0]
+        return word
+
+
 async def search_by_query_and_save_to_db(db_session: AsyncSession, query: str) -> WordDTO | None:
     async with get_aiohttp_session() as session:
         word_dictionary_url = await get_url_by_query(session, query)

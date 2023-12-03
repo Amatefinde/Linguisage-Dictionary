@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from core.database import db_helper
 from . import crud
 from sqlalchemy.ext.asyncio import AsyncSession
-from Parsers.word_collector import search_by_query_and_save_to_db
+from Parsers.word_collector import search_by_query_and_save_to_db, get_word_by_alias
 from .schemas import WordDTO, ImageDTO
 
 router = APIRouter(prefix="/words", tags=["Words"])
@@ -17,6 +17,10 @@ async def get_by_alias(
     word_dto = await crud.get_all_word_data(session, alias)
     if word_dto:
         return word_dto
+    elif word_dto := await crud.get_all_word_data(session, await get_word_by_alias(alias)):
+        await crud.add_alias_to_word(session, alias, word_dto.word)
+        return word_dto
+
     elif download_if_not_found:
         word_dto = await search_by_query_and_save_to_db(session, alias)
         if word_dto:
