@@ -17,7 +17,7 @@ async def get_by_alias(
     if word_dto:
         return word_dto
     elif download_if_not_found:
-        word_dto = await search_by_query_and_save_to_db(alias)
+        word_dto = await search_by_query_and_save_to_db(session, alias)
         if word_dto:
             return word_dto
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
