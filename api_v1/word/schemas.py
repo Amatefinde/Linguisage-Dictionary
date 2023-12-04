@@ -25,6 +25,11 @@ class ImageDTO(BaseDTO):
         return f"{settings.SERVER_HOST}:{settings.SERVER_PORT}/{value}"
 
 
+class WordForSenseDTO(BaseDTO):
+    id: int
+    word: str
+
+
 class SenseDTO(BaseDTO):
     id: int
     lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None = None
@@ -33,6 +38,8 @@ class SenseDTO(BaseDTO):
     examples: list[ExamplesDTO] = None
     row_examples: list[RowExamplesDTO] = None
     images: list[ImageDTO] = None
+
+    word: WordForSenseDTO | None = None
 
 
 class WordDTO(BaseDTO):
