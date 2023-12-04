@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from core.schemas import SWord, SSense
 from .schemas import WordDTO, SenseDTO, ImageDTO
+from typing import Iterable
 
 
 async def get_word_by_id(
@@ -106,8 +107,14 @@ async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Ali
         return db_alias
 
 
+def _filter_images_for_sense(sense: SenseDTO, collection: Iterable[int]) -> SenseDTO:
+    sense = sense.model_copy()
+    sense.images = [img for img in sense.images if img.id in collection]
+    return sense
+
+
 async def get_sense_with_word_and_images_by_sense_id(
-    session: AsyncSession, sense_id: int
+    session: AsyncSession, sense_id: int, images_id: list[int] = None
 ) -> SenseDTO | None:
     stmt = (
         select(Sense)
@@ -117,10 +124,11 @@ async def get_sense_with_word_and_images_by_sense_id(
         .options(selectinload(Sense.row_examples))
         .options(joinedload(Sense.word))
     )
+
     sense_db = await session.scalar(stmt)
     if sense_db:
-        # return sense_db
-        return SenseDTO.model_validate(sense_db)
+        sense_dto = SenseDTO.model_validate(sense_db)
+        return _filter_images_for_sense(sense_dto, images_id)
 
 
 async def get_image_by_id(session: AsyncSession, image_id: int) -> ImageDTO | None:

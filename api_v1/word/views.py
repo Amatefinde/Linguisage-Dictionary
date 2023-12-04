@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from core.database import db_helper
 from . import crud
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,9 +31,10 @@ async def get_by_alias(
 @router.get("/sense/{sense_id}")
 async def get_sense_by_id(
     sense_id: int,
+    images_id: list[int] = Query(default=[]),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    sense = await crud.get_sense_with_word_and_images_by_sense_id(session, sense_id)
+    sense = await crud.get_sense_with_word_and_images_by_sense_id(session, sense_id, images_id)
     return sense
 
 
