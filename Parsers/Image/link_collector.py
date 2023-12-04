@@ -1,4 +1,8 @@
-from schemas import SRowServerResponse
+try:
+    from .schemas import SRowServerResponse
+except ImportError:
+    from schemas import SRowServerResponse
+
 from requests.exceptions import JSONDecodeError
 from typing import TypedDict
 import cloudscraper
