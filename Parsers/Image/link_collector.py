@@ -8,7 +8,7 @@ from typing import TypedDict
 import concurrent.futures
 from seleniumbase import Driver
 
-driver = Driver(uc=False, headless2=True)
+driver = Driver(uc=True, headless2=True)
 
 
 class GetImageLinksError(Exception):
