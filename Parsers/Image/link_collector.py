@@ -8,8 +8,8 @@ from typing import TypedDict
 import concurrent.futures
 from seleniumbase import Driver
 
-
 driver = Driver(uc=True, headless2=True)
+
 
 class GetImageLinksError(Exception):
     pass
@@ -17,12 +17,12 @@ class GetImageLinksError(Exception):
 
 url: str = "https://quizlet.com/webapi/3.2/images/search"
 
-
 QueryParams = TypedDict("QueryParams", {"perPage": int, "query": str})
 
 
 def _make_request_to_server(params: QueryParams) -> list[str]:
-    driver.get(f"http://quizlet.com/webapi/3.2/images/search?query={params['query']}")
+    driver.get(
+        f"http://quizlet.com/webapi/3.2/images/search?query={params['query']}&perPage={params['perPage']}")
     response = json.loads(driver.get_text("body"))
     try:
         server_response = SRowServerResponse.model_validate(response, from_attributes=True)
