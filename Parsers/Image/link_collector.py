@@ -2,12 +2,14 @@ try:
     from .schemas import SRowServerResponse
 except ImportError:
     from schemas import SRowServerResponse
-
+import json
 from requests.exceptions import JSONDecodeError
 from typing import TypedDict
-import cloudscraper
 import concurrent.futures
+from seleniumbase import Driver
 
+
+driver = Driver(uc=True, headless2=True)
 
 class GetImageLinksError(Exception):
     pass
@@ -19,19 +21,11 @@ url: str = "https://quizlet.com/webapi/3.2/images/search"
 QueryParams = TypedDict("QueryParams", {"perPage": int, "query": str})
 
 
-def _make_request_to_server(params: QueryParams, max_attempts=16) -> list[str]:
-    if max_attempts < 1:
-        raise ValueError("max_attempts must be greater or equal them 1")
-    current_attempt = 1
-    while current_attempt <= max_attempts:
-        scrapper = cloudscraper.create_scraper()
-        response = scrapper.get(url, params=params)
-        if response.status_code == 200:
-            break
-        current_attempt += 1
-        print(response)
+def _make_request_to_server(params: QueryParams) -> list[str]:
+    driver.get(f"http://quizlet.com/webapi/3.2/images/search?query={params['query']}")
+    response = json.loads(driver.get_text("body"))
     try:
-        server_response = SRowServerResponse.model_validate(response.json(), from_attributes=True)
+        server_response = SRowServerResponse.model_validate(response, from_attributes=True)
     except JSONDecodeError:
         raise GetImageLinksError()
     return server_response.get_image_urls()
@@ -50,6 +44,10 @@ def get_links_by_query_list(query: queryT) -> dict[queryT, imagesT]:
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = list(executor.map(_get_images_by_query, query))
     return dict(zip(query, results))
+
+
+def shutdown():
+    driver.quit()
 
 
 if __name__ == "__main__":
