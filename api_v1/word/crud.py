@@ -128,7 +128,7 @@ async def get_sense_with_word_and_images_by_sense_id(
             selectinload(Sense.row_examples),
             selectinload(Sense.word),
         )
-        .filter(Sense.id == sense_id)
+        .where(Sense.id == sense_id)
     )
 
     sense_db = await session.scalar(stmt)
@@ -145,12 +145,9 @@ async def get_many_senses_with_word_and_images_by_sense_id(
     stmt = (
         select(Sense)
         .options(
-            joinedload(Sense.images),
-            joinedload(Sense.examples),
-            joinedload(Sense.row_examples),
-            joinedload(Sense.word),
+            joinedload(Sense.images, Sense.examples, Sense.row_examples, Sense.word),
         )
-        .filter(Sense.id.in_(senses_id), Image.id.in_(images_id))
+        .filter(Sense.id.in_(senses_id))
     )
 
     row_response = await session.execute(stmt)
