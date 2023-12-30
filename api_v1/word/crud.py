@@ -150,7 +150,7 @@ async def get_many_senses_with_word_and_images_by_sense_id(
             joinedload(Sense.row_examples),
             joinedload(Sense.word),
         )
-        .filter(Sense.id.in_(senses_id))
+        .filter(Sense.id.in_(senses_id), Image.id.in_(images_id))
     )
 
     row_response = await session.execute(stmt)
