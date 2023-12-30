@@ -1,5 +1,7 @@
-from sqlalchemy.orm import joinedload, selectinload
+import time
 
+from sqlalchemy.orm import joinedload, selectinload
+from loguru import logger
 from core.database.models import Word, Image, Example, Sense, RowExample, Alias
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -108,6 +110,7 @@ async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Ali
 
 
 def _filter_images_for_sense(sense: SenseDTO, collection: Iterable[int]) -> SenseDTO:
+    collection = set(collection)
     sense = sense.model_copy()
     sense.images = [img for img in sense.images if img.id in collection]
     return sense
@@ -116,19 +119,49 @@ def _filter_images_for_sense(sense: SenseDTO, collection: Iterable[int]) -> Sens
 async def get_sense_with_word_and_images_by_sense_id(
     session: AsyncSession, sense_id: int, images_id: list[int] = None
 ) -> SenseDTO | None:
+    start = time.time()
     stmt = (
         select(Sense)
-        .where(Sense.id == sense_id)
-        .options(selectinload(Sense.images))
-        .options(selectinload(Sense.examples))
-        .options(selectinload(Sense.row_examples))
-        .options(joinedload(Sense.word))
+        .options(
+            joinedload(Sense.images),
+            joinedload(Sense.examples),
+            joinedload(Sense.row_examples),
+            joinedload(Sense.word),
+        )
+        .filter(Sense.id == sense_id)
     )
 
     sense_db = await session.scalar(stmt)
     if sense_db:
+        logger.info(f"Time for get only one sense with images and example: {time.time()-start}s")
         sense_dto = SenseDTO.model_validate(sense_db)
+        logger.info(f"Time for get only one sense with images and example: {time.time()-start}s")
         return _filter_images_for_sense(sense_dto, images_id)
+
+
+async def get_many_senses_with_word_and_images_by_sense_id(
+    session: AsyncSession, senses_id: list[int], images_id: list[int] = None
+) -> list[SenseDTO] | None:
+    stmt = (
+        select(Sense)
+        .options(
+            joinedload(Sense.images),
+            joinedload(Sense.examples),
+            joinedload(Sense.row_examples),
+            joinedload(Sense.word),
+        )
+        .filter(Sense.id.in_(senses_id), Image.id.in_(images_id))
+    )
+
+    row_response = await session.execute(stmt)
+    senses_db = row_response.scalars().unique().all()
+    if senses_db:
+        senses_dto: list[SenseDTO] = []
+        for sense in senses_db:
+            sense_dto = SenseDTO.model_validate(sense)
+            sense_dto_with_filtered_images = _filter_images_for_sense(sense_dto, images_id)
+            senses_dto.append(sense_dto_with_filtered_images)
+        return senses_dto
 
 
 async def get_image_by_id(session: AsyncSession, image_id: int) -> ImageDTO | None:
