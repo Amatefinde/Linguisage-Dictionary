@@ -62,7 +62,7 @@ async def get_senses_with_images(
     senses_with_images: RequestSensesWithImages,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    tasks = []
+    logger.debug(senses_with_images)
     start = time.time()
     senses_id = [sense.sense_id for sense in senses_with_images.senses]
     images_id = [image_id for sense in senses_with_images.senses for image_id in sense.images_ids]

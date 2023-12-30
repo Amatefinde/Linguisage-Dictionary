@@ -123,10 +123,10 @@ async def get_sense_with_word_and_images_by_sense_id(
     stmt = (
         select(Sense)
         .options(
-            joinedload(Sense.images),
-            joinedload(Sense.examples),
-            joinedload(Sense.row_examples),
-            joinedload(Sense.word),
+            selectinload(Sense.images),
+            selectinload(Sense.examples),
+            selectinload(Sense.row_examples),
+            selectinload(Sense.word),
         )
         .filter(Sense.id == sense_id)
     )
