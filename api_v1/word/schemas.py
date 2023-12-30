@@ -46,3 +46,12 @@ class WordDTO(BaseDTO):
     id: int
     word: str
     senses: list[SenseDTO]
+
+
+class RequestSenseWithImages(BaseModel):
+    sense_id: int
+    images_ids: list[int]
+
+
+class RequestSensesWithImages(BaseModel):
+    senses: list[RequestSenseWithImages]

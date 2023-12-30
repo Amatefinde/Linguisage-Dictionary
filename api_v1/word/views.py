@@ -1,9 +1,14 @@
+import asyncio
+import time
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from loguru import logger
+
 from core.database import db_helper
 from . import crud
 from sqlalchemy.ext.asyncio import AsyncSession
 from Parsers.word_collector import search_by_query_and_save_to_db, get_word_by_alias
-from .schemas import WordDTO, ImageDTO
+from .schemas import WordDTO, ImageDTO, RequestSensesWithImages, SenseDTO
 
 router = APIRouter(prefix="/words", tags=["Words"])
 
@@ -47,3 +52,20 @@ async def get_image_by_id(
     if image:
         return image
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.post("/get_senses_with_images_by_id", response_model=list[SenseDTO])
+async def get_senses_with_images(
+    senses_with_images: RequestSensesWithImages,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    tasks = []
+    start = time.time()
+    for sense in senses_with_images.senses:
+        task = crud.get_sense_with_word_and_images_by_sense_id(
+            session, sense.sense_id, sense.images_ids
+        )
+        tasks.append(task)
+    senses = await asyncio.gather(*tasks)
+    logger.info(f"Time for get senses with images and examples: {time.time() - start}s")
+    return senses
