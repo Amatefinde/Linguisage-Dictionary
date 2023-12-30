@@ -145,7 +145,10 @@ async def get_many_senses_with_word_and_images_by_sense_id(
     stmt = (
         select(Sense)
         .options(
-            joinedload(Sense.images, Sense.examples, Sense.row_examples, Sense.word),
+            joinedload(Sense.images),
+            joinedload(Sense.examples),
+            joinedload(Sense.row_examples),
+            joinedload(Sense.word),
         )
         .filter(Sense.id.in_(senses_id))
     )
