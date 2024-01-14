@@ -1,14 +1,23 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Literal
+from enum import Enum
 
 
-class SSense(BaseModel):
+class PartOfSpeech(Enum):
+    VERB = "verb"
+    NOUN = "noun"
+    ADVERB = "adverb"
+    ADJECTIVE = "adjective"
+    EXCLAMATION = "exclamation"
+    PHRASAL_VERB = "phrasal verb"
+
+
+class SDictionarySense(BaseModel):
     lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None = None
     definition: str
     short_cut: str | None = None
     examples: list[str] | None = []
     row_examples: list[str] | None = []
-    images: list[str] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,7 +38,10 @@ class SPhrasalVerb(BaseModel):
 
 class SWord(BaseModel):
     word: str
-    senses: list[SSense] = []
+    part_of_speech: PartOfSpeech | None = None
+    sound_uk_url: str | None = None
+    sound_us_url: str | None = None
+    senses: list[SDictionarySense] = []
     phrasal_verbs: list[SPhrasalVerb] = []
     idioms: list[SIdiom] = []
 

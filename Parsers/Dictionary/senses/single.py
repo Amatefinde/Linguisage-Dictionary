@@ -1,11 +1,10 @@
-from core.schemas import SSense
+from Parsers.Dictionary.schemas import SDictionarySense
 from .sense_parser import Sense
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag
 
 
-def parse_single(soup: BeautifulSoup, link: str | None = None) -> list[SSense]:
+def parse_single(soup: BeautifulSoup, link: str | None = None) -> list[SDictionarySense]:
     sense_single = soup.find("ol", "sense_single")
 
     row_sense = sense_single.find("li", class_="sense")

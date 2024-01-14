@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
-from core.schemas import SSense
+from Parsers.Dictionary.schemas import SDictionarySense
 import unicodedata
 
 
@@ -10,14 +10,14 @@ class Sense:
         self.sense = sense
         self.link = link
 
-        self.__parsed_sense = SSense.model_validate(self.parse_sense())
+        self.__parsed_sense = SDictionarySense.model_validate(self.parse_sense())
 
     @staticmethod
     def __validate_sense(sense, link):
         if type(sense) not in (BeautifulSoup, Tag):
             raise TypeError('arg: sense - must be  "BeautifulSoup" or "Tag"')
 
-    def parse_sense(self) -> SSense:
+    def parse_sense(self) -> SDictionarySense:
         parsed_sense = {
             "lvl": self._get_lvl(),
             "examples": self._get_examples(),
@@ -25,7 +25,7 @@ class Sense:
             "definition": self._get_definition(),
         }
 
-        return SSense.model_validate(parsed_sense)
+        return SDictionarySense.model_validate(parsed_sense)
 
     @property
     def parsed_sense(self):
