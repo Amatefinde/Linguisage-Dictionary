@@ -2,9 +2,8 @@ import asyncio
 
 import aiohttp
 from aiohttp import TCPConnector, ClientTimeout, ClientSession
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from Parsers import get_url_by_query
+from scripts import get_url_by_query
 import api_v1
 from core.database import db_helper
 from utils import split_on_batches
