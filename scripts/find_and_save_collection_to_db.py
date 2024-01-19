@@ -39,7 +39,6 @@ async def find_and_save_to_db(
             core_word: CoreSWord = await collect_and_download_one(
                 aiohttp_session, query=query, collector=collector
             )
-        logger.info(core_word)
         async with db_helper.session_factory() as db_session:
             async with db_session.begin():
                 await crud.create_or_supplement_db_public_word(db_session, core_word)
