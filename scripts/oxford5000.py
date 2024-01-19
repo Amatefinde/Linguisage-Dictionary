@@ -42,7 +42,7 @@ async def get_aiohttp_session():
 async def main(link_to_list):
     async with await get_aiohttp_session() as aiohttp_session:
         row_html = await fetch_as_html(aiohttp_session, link_to_list)
-        words: set[str] = set(get_words_from_dictionary_list(row_html))
+        words = list(dict.fromkeys(get_words_from_dictionary_list(row_html)))
         logger.info(f"Found {len(words)} words")
         await find_many_and_save_to_db(words)
 
