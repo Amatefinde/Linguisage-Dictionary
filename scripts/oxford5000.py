@@ -32,14 +32,14 @@ def get_words_from_dictionary_list(row_html: str) -> list[str]:
 
 async def get_aiohttp_session():
     aiohttp_session_config: dict = {
-        "headers": {"User-Agent": UserAgent.random},
+        "headers": {"User-Agent": print(UserAgent().random)},
         "connector": TCPConnector(force_close=True),
         "timeout": ClientTimeout(6 * 60 * 60),
     }
     return aiohttp.ClientSession(**aiohttp_session_config)
 
 
-async def main(link_to_list: str, start_word: str | None = None):
+async def main(link_to_list):
     async with await get_aiohttp_session() as aiohttp_session:
         row_html = await fetch_as_html(aiohttp_session, link_to_list)
         words: set[str] = set(get_words_from_dictionary_list(row_html))

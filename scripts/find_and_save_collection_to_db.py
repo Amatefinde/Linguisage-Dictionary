@@ -17,7 +17,7 @@ from fake_useragent import UserAgent
 
 async def get_aiohttp_session():
     aiohttp_session_config: dict = {
-        "headers": {"User-Agent": UserAgent.random},
+        "headers": {"User-Agent": UserAgent().random},
         "connector": TCPConnector(force_close=True),
         "timeout": ClientTimeout(6 * 60 * 60),
     }
