@@ -1,10 +1,10 @@
 import asyncio
-from typing import Iterable
-
+import traceback
 import aiohttp
+
+from typing import Iterable
 from loguru import logger
 from aiohttp import TCPConnector
-from aiohttp.client import ClientSession
 from aiohttp.client import ClientTimeout
 
 from core.database import db_helper
@@ -53,5 +53,6 @@ async def find_many_and_save_to_db(words: Iterable[str]) -> None:
                 await find_and_save_to_db(word, image_collector)
             except Exception as Ex:
                 logger.error(Ex)
+                logger.error(traceback.format_exc())
                 await asyncio.sleep(1)
                 await find_and_save_to_db(word, image_collector)
