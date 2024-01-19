@@ -99,7 +99,7 @@ async def create_or_supplement_db_public_word(
     if not db_word:
         db_word = await get_word(session, word.word)
         if db_word:
-            db_alias = Alias(alias=word.alias, word=word.word)
+            db_alias = Alias(alias=word.alias, word=db_word)
             session.add(db_alias)
             await session.commit()
 
