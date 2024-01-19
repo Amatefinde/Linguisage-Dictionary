@@ -108,7 +108,7 @@ async def create_or_supplement_db_public_word(
 
     db_senses: list[Sense] = get_db_senses_from_s_public_word(word)
     for db_sense in db_senses:
-        if not find_public_db_sense_by_definition(session, db_sense.definition):
+        if not await find_public_db_sense_by_definition(session, db_sense.definition):
             db_sense.word_id = db_word.id
             session.add(db_sense)
             await session.commit()
