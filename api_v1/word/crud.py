@@ -1,3 +1,4 @@
+from loguru import logger
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -101,18 +102,18 @@ async def create_or_supplement_db_public_word(
         if db_word:
             db_alias = Alias(alias=word.alias, word=db_word)
             session.add(db_alias)
-            await session.commit()
 
     if not db_word:
-        db_word = await create_db_word(session, word, is_public=True)
+        await session.commit()
+        return await create_db_word(session, word, is_public=True)
 
     db_senses: list[Sense] = get_db_senses_from_s_public_word(word)
     for db_sense in db_senses:
         if not await find_public_db_sense_by_definition(session, db_sense.definition):
             db_sense.word_id = db_word.id
             session.add(db_sense)
-            await session.commit()
 
+    await session.commit()
     return db_word
 
 
