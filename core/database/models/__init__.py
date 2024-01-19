@@ -1,13 +1,14 @@
 __all__ = (
     "Word",
     "Sense",
-    "Image",
-    "RowExample",
+    "WordImage",
+    "SenseImage",
+    "HtmlExample",
     "Example",
     "Alias",
 )
 
-from .word import Word, Alias
-from .sense import Sense, Image
-from .row_example import RowExample
+from .word import Word, Alias, WordImage
+from .sense import Sense, SenseImage
+from .html_example import HtmlExample
 from .example import Example

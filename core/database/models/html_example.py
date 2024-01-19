@@ -7,8 +7,8 @@ if TYPE_CHECKING:
     from .sense import Sense
 
 
-class RowExample(Base):
-    __tablename__ = "row_example"
-    row_example: Mapped[str]
-    sense: Mapped["Sense"] = relationship(back_populates="row_examples")
+class HtmlExample(Base):
+    __tablename__ = "html_example"
+    html_example: Mapped[str]
+    sense: Mapped["Sense"] = relationship(back_populates="html_examples")
     sense_id: Mapped["int"] = mapped_column(ForeignKey("sense.id"))

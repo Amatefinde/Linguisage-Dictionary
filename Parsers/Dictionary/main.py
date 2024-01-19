@@ -1,6 +1,6 @@
 from .page_fetcher import get_html_pages_by_query
 from .senses import parse_multiply, parse_single
-from .schemas import SDictionarySense, SWord, PartOfSpeech
+from .schemas import SDictionarySense, SWord
 
 import asyncio
 import aiohttp
@@ -25,8 +25,9 @@ def _parse_headword(soup: BeautifulSoup, link: str | None = None):
     return soup.find("h1", class_="headword").text
 
 
-def _parse_part_of_speech(soup: BeautifulSoup) -> PartOfSpeech:
-    return PartOfSpeech(soup.find("span", class_="pos").text)
+def _parse_part_of_speech(soup: BeautifulSoup) -> str | None:
+    if pos := soup.find("span", class_="pos"):
+        return pos.text
 
 
 class WordSound(NamedTuple):
@@ -44,13 +45,14 @@ def _parse_sounds(soup: BeautifulSoup) -> WordSound:
     return WordSound(sound_us, sound_uk)
 
 
-async def _parse_page(row_html: str, link) -> SWord:
+async def _parse_page(row_html: str, query: str) -> SWord:
     soup = BeautifulSoup(row_html, "lxml")
-    senses: list[SDictionarySense] = _parse_senses(soup, link)
+    senses: list[SDictionarySense] = _parse_senses(soup, query)
     word: str = _parse_headword(soup)
-    part_of_speech: PartOfSpeech = _parse_part_of_speech(soup)
+    part_of_speech: str = _parse_part_of_speech(soup)
     sound: WordSound = _parse_sounds(soup)
     return SWord(
+        alias=query.lower(),
         word=word,
         senses=senses,
         part_of_speech=part_of_speech,
@@ -63,7 +65,7 @@ async def get_words(session: ClientSession, query: str) -> list[SWord]:
     html_pages: list[str] = await get_html_pages_by_query(session, query)
     words: list[SWord] = []
     for page in html_pages:
-        words.append(await _parse_page(page, "dummy link"))  # todo
+        words.append(await _parse_page(page, query))  # todo
     return words
 
 

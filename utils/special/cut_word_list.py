@@ -1,4 +1,4 @@
-from core.schemas import SWordDictionaryLink
+from Parsers.Dictionary.schemas import SWordDictionaryLink
 
 
 def _cut_word_link_list(

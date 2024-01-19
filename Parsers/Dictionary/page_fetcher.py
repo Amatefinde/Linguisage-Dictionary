@@ -1,3 +1,5 @@
+from loguru import logger
+
 from core.config import settings
 from utils import join_url
 
@@ -5,7 +7,7 @@ from urllib.parse import urlparse
 from aiohttp import ClientSession
 
 
-SEARCH_ENDPOINT_URL = "/search/english"
+SEARCH_ENDPOINT_URL = "/us/search/english"
 SEARCH_DICTIONARY_URL = join_url(settings.DICTIONARY_BASE_URL, SEARCH_ENDPOINT_URL) + "/"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
@@ -34,15 +36,17 @@ async def _find_page_in_dictionary(session: ClientSession, query: str) -> str | 
 
 async def _get_all_pages_for_word(session: ClientSession, word_base_url_path: str) -> list[str]:
     html_pages: list[str] = []
-    while (word_number := word_base_url_path.split("/")[-1].split("_")[-1]).isdigit():
-        if not (html_page := await _fetch_page(session, word_base_url_path)):
-            break
-        html_pages.append(html_page)
-        word_base_url_path = word_base_url_path.replace(
-            f"_{word_number}",
-            f"_{int(word_number)+1}",
-        )
-    return html_pages
+    if word_base_url_path.split("/")[-1].split("_")[-1].isdigit():
+        while word_number := word_base_url_path.split("/")[-1].split("_")[-1]:
+            if not (html_page := await _fetch_page(session, word_base_url_path)):
+                break
+            html_pages.append(html_page)
+            word_base_url_path = word_base_url_path.replace(
+                f"_{word_number}",
+                f"_{int(word_number)+1}",
+            )
+        return html_pages
+    return [await _fetch_page(session, word_base_url_path)]
 
 
 async def get_html_pages_by_query(session: ClientSession, query: str) -> list[str]:

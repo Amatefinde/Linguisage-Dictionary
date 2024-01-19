@@ -38,7 +38,7 @@ def _get_parsed_senses_from_sh_cut_g(short_cuts: list[BeautifulSoup], link):
 def _get_parser_senses_from_senses_multiple(
     senses_multiple: BeautifulSoup,
     link: str,
-) -> list[SDictionarySense]:
+) -> list[SDictionarySense] | None:
     senses: list[BeautifulSoup] | None = senses_multiple.find_all("li", class_="sense")
     return _parse_senses(senses, link)
 

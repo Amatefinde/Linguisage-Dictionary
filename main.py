@@ -1,27 +1,19 @@
-import sys
+from api_v1 import router as api_v1_router
+from core import make_static_folder
+from core.config import settings
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from api_v1 import router as api_v1_router
-from core.config import settings
-from Parsers.Image import link_collector
-import os
-
-if not os.path.exists("./static"):
-    os.mkdir("./static")
-
-if not os.path.exists("./static/word_images"):
-    os.mkdir("./static/word_images")
+make_static_folder()
 
 app = FastAPI(title=settings.MICROSERVICE_NAME)
 app.include_router(api_v1_router)
 
 app.mount(
-    f"/static/word_images",
-    StaticFiles(directory=f"./static/word_images"),
-    name="static_images",
+    "/static",  # url_path
+    StaticFiles(directory=settings.STATIC_PATH),  # path_to_directory
+    name="/static_files",
 )
 
-
-app.add_event_handler("shutdown", lambda: link_collector.shutdown())
+# app.add_event_handler("shutdown", lambda: link_collector.shutdown())

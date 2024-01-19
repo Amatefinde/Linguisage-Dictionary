@@ -27,3 +27,17 @@ class Word(Base):
     senses: Mapped[list["Sense"]] = relationship(
         back_populates="word", cascade="all, delete-orphan"
     )
+    sound_uk: Mapped[str | None]
+    sound_us: Mapped[str | None]
+
+    word_images: Mapped[list["WordImage"]] = relationship(
+        back_populates="word", cascade="all, delete-orphan"
+    )
+
+
+class WordImage(Base):
+    img: Mapped[str]
+    is_public: Mapped[bool]
+
+    word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
+    word: Mapped["Word"] = relationship(back_populates="word_images")

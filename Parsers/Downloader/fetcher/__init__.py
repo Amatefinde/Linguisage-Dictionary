@@ -1,3 +1,6 @@
-__all__ = ["fetch"]
+__all__ = [
+    "fetch_one",
+    "fetch_many",
+]
 
-from .fetcher import fetch
+from .fetcher import fetch_one, fetch_many
