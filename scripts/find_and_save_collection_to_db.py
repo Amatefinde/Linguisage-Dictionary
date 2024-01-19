@@ -51,4 +51,9 @@ async def find_many_and_save_to_db(words: Iterable[str]) -> None:
         async with await get_aiohttp_session() as aiohttp_session:
             for idx, word in enumerate(words, 1):
                 logger.info((idx, word))
-                await find_and_save_to_db(word, image_collector, aiohttp_session)
+                try:
+                    await find_and_save_to_db(word, image_collector, aiohttp_session)
+                except Exception as Ex:
+                    logger.error(Ex)
+                    await asyncio.sleep(1)
+                    await find_and_save_to_db(word, image_collector, aiohttp_session)

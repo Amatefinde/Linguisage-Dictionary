@@ -17,7 +17,7 @@ def _parse_senses(soup: BeautifulSoup, link: str | None = None) -> list[SDiction
     elif soup.find("ol", class_="sense_single"):
         senses = parse_single(soup, link)
     else:
-        logger.error("Undefined case: ", link)
+        logger.debug("Undefined case: ", link)
     return senses
 
 
