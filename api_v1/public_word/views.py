@@ -19,7 +19,7 @@ async def get_by_alias(
 
 
 @router.post("/get_senses", response_model=SResponseSenses)
-async def get_by_alias(
+async def get_senses_with_images(
     request_senses: SRequestManySense,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
