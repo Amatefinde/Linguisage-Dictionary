@@ -26,7 +26,7 @@ async def get_word_by_alias(
     session: AsyncSession,
     alias: str,
 ) -> Word | None:
-    stmt = select(Alias).where(Alias.alias == alias).options(selectinload(Alias.word))
+    stmt = select(Alias).where(Alias.alias == alias.lower()).options(selectinload(Alias.word))
     if db_alias := await session.scalar(stmt):
         return db_alias.word
 
@@ -100,7 +100,7 @@ async def create_or_supplement_db_public_word(
     if not db_word:
         db_word = await get_word(session, word.word)
         if db_word:
-            db_alias = Alias(alias=word.alias, word=db_word)
+            db_alias = Alias(alias=word.alias.lower(), word=db_word)
             session.add(db_alias)
 
     if not db_word:
