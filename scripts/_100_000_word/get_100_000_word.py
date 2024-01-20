@@ -15,5 +15,4 @@ async def main():
         await find_many_and_save_to_db(aliases)
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
