@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from core.database.models import Word, SenseImage, Example, Sense, HtmlExample, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
+from utils import async_timer
 from .schemas import SRequestSense, SRequestManySense, SResponseSense, SWordImage
 
 
@@ -131,6 +132,7 @@ async def get_full_word(session: AsyncSession, alias: str):
     return row_response.scalar()
 
 
+@async_timer
 async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManySense):
     word_image_ids = []
     sense_image_ids = []
@@ -143,11 +145,13 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
     stmt = (
         select(Sense)
         .options(
-            selectinload(Sense.html_examples),
+            joinedload(Sense.html_examples),
             joinedload(Sense.word),
-            selectinload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
+            joinedload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
         )
-        .where(Sense.id.in_(senses_map), WordImage.id.in_(word_image_ids))
+        .join(Word, Sense.word_id == Word.id)
+        .join(WordImage, WordImage.word_id == Word.id)
+        .where(Sense.id.in_(senses_map))
     )
     row_response = await session.execute(stmt)
     senses_for_response = []
