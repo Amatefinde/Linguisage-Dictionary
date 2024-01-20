@@ -7,7 +7,7 @@ from loguru import logger
 
 from core.database import db_helper
 from core.schemas import CoreSWord
-from api_v1.word import crud
+from api_v1.public_word import crud
 from Parsers.main_collector import collect_and_download_one
 from Parsers import SeleniumBaseImgCollector, GetImageLinksError
 from fake_useragent import UserAgent
