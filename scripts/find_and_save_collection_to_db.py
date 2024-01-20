@@ -47,7 +47,7 @@ async def find_many_and_save_to_db(words: Iterable[str]) -> None:
             try:
                 await find_and_save_to_db(word, image_collector)
             except WordNotExist:
-                logger.info(f"Word by query {words} not found in dictionary")
+                logger.info(f"Word by query {word} not found in dictionary")
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())
