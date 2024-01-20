@@ -1,36 +1,31 @@
-# import time
-#
-# from fastapi import APIRouter, Depends, HTTPException, status, Query
-# from loguru import logger
-#
-# from core.database import db_helper
-# from . import crud
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from .schemas import WordDTO, ImageDTO, RequestSensesWithImages, SenseDTO
-#
-# router = APIRouter(prefix="/words", tags=["Words"])
+import time
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from loguru import logger
+
+from core.database import db_helper
+from . import crud
+from .schemas import SRequestSense, SRequestManySense, SResponseSenses
+
+router = APIRouter(prefix="/public_words", tags=["Public words"])
 
 
-# @router.get("/alias", response_model=WordDTO)
-# async def get_by_alias(
-#     alias: str,
-#     download_if_not_found: bool = True,
-#     session: AsyncSession = Depends(db_helper.session_dependency),
-# ):
-#     word_dto = await crud.get_all_word_data(session, alias)
-#     if word_dto:
-#         return word_dto
-#     elif word_dto := await crud.get_all_word_data(session, await get_word_by_alias(alias)):
-#         await crud.add_alias_to_word(session, alias, word_dto.word)
-#         return word_dto
-#
-#     elif download_if_not_found:
-#         word_dto = await search_by_query_and_save_to_db(session, alias)
-#         if word_dto:
-#             return word_dto
-#     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-#
-#
+@router.get("/")
+async def get_by_alias(
+    query: str,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.get_full_word(session, query)
+
+
+@router.post("/get_senses", response_model=SResponseSenses)
+async def get_by_alias(
+    request_senses: SRequestManySense,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return SResponseSenses(senses=await crud.get_senses_by_ids(session, request_senses))
+
+
 # @router.get("/sense/{sense_id}")
 # async def get_sense_by_id(
 #     sense_id: int,
