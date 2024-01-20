@@ -1,10 +1,10 @@
 from loguru import logger
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
+from sqlalchemy import select, and_
 from core.database.models import Word, SenseImage, Example, Sense, HtmlExample, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
+from .schemas import SRequestSense, SRequestManySense, SResponseSense, SWordImage
 
 
 async def get_word_by_id(
@@ -116,89 +116,47 @@ async def create_or_supplement_db_public_word(
     return db_word
 
 
-# async def get_all_word_data(session: AsyncSession, alias: str):
-#     stmt = (
-#         select(Alias)
-#         .where(Alias.alias == alias)
-#         .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.examples))
-#         .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.row_examples))
-#         .options(joinedload(Alias.word).selectinload(Word.senses).selectinload(Sense.images))
-#     )
-#     db_response = await session.execute(stmt)
-#     result = db_response.scalar()
-#     if result:
-#         return WordDTO.model_validate(result.word)
-#
-#
-# async def add_alias_to_word(session: AsyncSession, alias: str, word: str) -> Alias | None:
-#     stmt = select(Alias).where(Alias.alias == alias)
-#     db_alias = await session.scalar(stmt)
-#     db_word = await get_word_by_name(session, word)
-#     if not db_word:
-#         return
-#     if not db_alias:
-#         db_alias = Alias(alias=alias, word=db_word)
-#         session.add(db_alias)
-#         await session.commit()
-#         return db_alias
-#
-#
-# def _filter_images_for_sense(sense: SenseDTO, collection: Iterable[int]) -> SenseDTO:
-#     collection = set(collection)
-#     sense = sense.model_copy()
-#     sense.images = [img for img in sense.images if img.id in collection]
-#     return sense
-#
-#
-# async def get_sense_with_word_and_images_by_sense_id(
-#     session: AsyncSession, sense_id: int, images_id: list[int] = None
-# ) -> SenseDTO | None:
-#     start = time.time()
-#     stmt = (
-#         select(Sense)
-#         .options(
-#             selectinload(Sense.images),
-#             selectinload(Sense.examples),
-#             selectinload(Sense.row_examples),
-#             selectinload(Sense.word),
-#         )
-#         .where(Sense.id == sense_id)
-#     )
-#
-#     sense_db = await session.scalar(stmt)
-#     if sense_db:
-#         logger.info(f"Time for get only one sense with images and example: {time.time()-start}s")
-#         sense_dto = SenseDTO.model_validate(sense_db)
-#         logger.info(f"Time for get only one sense with images and example: {time.time()-start}s")
-#         return _filter_images_for_sense(sense_dto, images_id)
-#
-#
-# async def get_many_senses_with_word_and_images_by_sense_id(
-#     session: AsyncSession, senses_id: list[int], images_id: list[int] = None
-# ) -> list[SenseDTO] | None:
-#     stmt = (
-#         select(Sense)
-#         .options(
-#             joinedload(Sense.images),
-#             joinedload(Sense.examples),
-#             joinedload(Sense.row_examples),
-#             joinedload(Sense.word),
-#         )
-#         .filter(Sense.id.in_(senses_id))
-#     )
-#
-#     row_response = await session.execute(stmt)
-#     senses_db = row_response.scalars().unique().all()
-#     if senses_db:
-#         senses_dto: list[SenseDTO] = []
-#         for sense in senses_db:
-#             sense_dto = SenseDTO.model_validate(sense)
-#             sense_dto_with_filtered_images = _filter_images_for_sense(sense_dto, images_id)
-#             senses_dto.append(sense_dto_with_filtered_images)
-#         return senses_dto
-#
-#
-# async def get_image_by_id(session: AsyncSession, image_id: int) -> ImageDTO | None:
-#     image_db = await session.get(Image, image_id)
-#     if image_db:
-#         return ImageDTO.model_validate(image_db)
+async def get_full_word(session: AsyncSession, alias: str):
+    stmt = (
+        select(Alias)
+        .where(Alias.alias == alias)
+        .options(
+            joinedload(Alias.word),
+            joinedload(Alias.word, Word.word_images),
+            joinedload(Alias.word, Word.senses),
+            joinedload(Alias.word, Word.senses, Sense.html_examples),
+        )
+    )
+    row_response = await session.execute(stmt)
+    return row_response.scalar()
+
+
+async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManySense):
+    word_image_ids = []
+    sense_image_ids = []
+    senses_map: dict[int, SRequestSense] = {}
+    for request_sense in request_senses.senses:
+        senses_map[request_sense.sense_id] = request_sense
+        word_image_ids.extend(request_sense.word_image_ids)
+        sense_image_ids.extend(request_sense.sense_image_ids)
+
+    stmt = (
+        select(Sense)
+        .options(
+            selectinload(Sense.html_examples),
+            joinedload(Sense.word),
+            selectinload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
+        )
+        .where(Sense.id.in_(senses_map), WordImage.id.in_(word_image_ids))
+    )
+    row_response = await session.execute(stmt)
+    senses_for_response = []
+    for sense in row_response.unique().mappings().all():
+        ready_sense = SResponseSense.model_validate(sense["Sense"], from_attributes=True)
+        ready_sense.word_images = [
+            SWordImage.model_validate(image)
+            for image in sense.Sense.word.word_images
+            if image.id in senses_map[sense.Sense.id].word_image_ids  # keep only requested img
+        ]
+        senses_for_response.append(ready_sense)
+    return senses_for_response
