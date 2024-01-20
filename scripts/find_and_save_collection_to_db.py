@@ -4,8 +4,6 @@ import aiohttp
 
 from typing import Iterable
 from loguru import logger
-from aiohttp import TCPConnector
-from aiohttp.client import ClientTimeout
 
 from core.database import db_helper
 from core.schemas import CoreSWord
@@ -16,11 +14,7 @@ from fake_useragent import UserAgent
 
 
 async def get_aiohttp_session():
-    aiohttp_session_config: dict = {
-        "headers": {"User-Agent": UserAgent().random},
-        "connector": TCPConnector(force_close=True),
-        "timeout": ClientTimeout(6 * 60 * 60),
-    }
+    aiohttp_session_config: dict = {"headers": {"User-Agent": UserAgent().random}}
     return aiohttp.ClientSession(**aiohttp_session_config)
 
 
@@ -54,5 +48,5 @@ async def find_many_and_save_to_db(words: Iterable[str]) -> None:
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())
-                await asyncio.sleep(1)
+                await asyncio.sleep(5)
                 await find_and_save_to_db(word, image_collector)
