@@ -8,7 +8,7 @@ from loguru import logger
 from core.database import db_helper
 from core.schemas import CoreSWord
 from api_v1.public_word import crud
-from Parsers.main_collector import collect_and_download_one
+from Parsers.main_collector import collect_and_download_one, WordNotExist
 from Parsers import SeleniumBaseImgCollector, GetImageLinksError
 from fake_useragent import UserAgent
 
@@ -38,6 +38,7 @@ async def find_and_save_to_db(
                 await crud.create_or_supplement_db_public_word(db_session, core_word)
 
 
+@logger.catch
 async def find_many_and_save_to_db(words: Iterable[str]) -> None:
     image_collector = SeleniumBaseImgCollector()
     with image_collector:
@@ -45,6 +46,8 @@ async def find_many_and_save_to_db(words: Iterable[str]) -> None:
             logger.info((idx, word))
             try:
                 await find_and_save_to_db(word, image_collector)
+            except WordNotExist:
+                logger.info(f"Word by query {words} not found in dictionary")
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())

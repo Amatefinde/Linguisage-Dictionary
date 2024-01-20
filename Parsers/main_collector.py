@@ -41,6 +41,10 @@ async def __get_sound_from_words(words) -> Sounds:
     return Sounds(sound_uk=sound_uk, sound_us=sound_us)
 
 
+class WordNotExist(Exception):
+    pass
+
+
 async def collect_and_download_one(
     session: ClientSession,
     query: str,
@@ -55,6 +59,8 @@ async def collect_and_download_one(
             images_urls: list[str] = collector.get_images_url_by_query(query, amount_images)
 
     words: list[parser_SWord] = await get_words(session, query)
+    if not words:
+        raise WordNotExist()
     s_senses: list[CoreSSense] = []
     sound_uk, sound_us = await __get_sound_from_words(words)
     for word in words:
