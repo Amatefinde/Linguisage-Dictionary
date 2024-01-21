@@ -39,10 +39,10 @@ async def find_and_save_to_db(
 
 
 @logger.catch
-async def find_many_and_save_to_db(words: Iterable[str]) -> None:
+async def find_many_and_save_to_db(words: Iterable[str], start: int = None) -> None:
     image_collector = SeleniumBaseImgCollector()
     with image_collector:
-        for idx, word in enumerate(words, 1):
+        for idx, word in enumerate(words[start:], start):
             logger.info((idx, word))
             try:
                 await find_and_save_to_db(word, image_collector)
