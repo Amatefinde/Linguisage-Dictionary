@@ -7,7 +7,7 @@ from core.database import db_helper
 from . import crud
 from .schemas import SRequestSense, SRequestManySense, SResponseSenses
 
-router = APIRouter(prefix="/public_words", tags=["Public words"])
+router = APIRouter(prefix="/public", tags=["Public words"])
 
 
 @router.get("/")
