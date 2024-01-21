@@ -1,7 +1,7 @@
 from loguru import logger
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select
 from core.database.models import Word, SenseImage, Example, Sense, HtmlExample, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
 from utils import async_timer
@@ -32,28 +32,28 @@ async def get_word_by_alias(
         return db_alias.word
 
 
-def get_db_examples_from_s_sense(sense: CoreSSense) -> list[Example]:
+def _get_db_examples_from_s_sense(sense: CoreSSense) -> list[Example]:
     db_examples = []
     for example in sense.examples:
         db_examples.append(Example(example=example))
     return db_examples
 
 
-def get_db_html_examples_from_s_sense(sense: CoreSSense) -> list[HtmlExample]:
+def _get_db_html_examples_from_s_sense(sense: CoreSSense) -> list[HtmlExample]:
     db_html_examples = []
     for html_example in sense.html_examples:
         db_html_examples.append(HtmlExample(html_example=html_example))
     return db_html_examples
 
 
-def get_db_word_images_from_s_public_word(word: CoreSWord) -> list[WordImage]:
+def _get_db_word_images_from_s_public_word(word: CoreSWord) -> list[WordImage]:
     db_sense_images = []
     for img in word.images:
         db_sense_images.append(WordImage(img=img, is_public=True))
     return db_sense_images
 
 
-def get_db_senses_from_s_public_word(word: CoreSWord) -> list[Sense]:
+def _get_db_senses_from_s_public_word(word: CoreSWord) -> list[Sense]:
     senses = []
     for sense in word.senses:
         db_sense = Sense(
@@ -62,8 +62,8 @@ def get_db_senses_from_s_public_word(word: CoreSWord) -> list[Sense]:
             part_of_speech=sense.part_of_speech,
             definition=sense.definition,
             short_cut=sense.short_cut,
-            examples=get_db_examples_from_s_sense(sense),
-            html_examples=get_db_html_examples_from_s_sense(sense),
+            examples=_get_db_examples_from_s_sense(sense),
+            html_examples=_get_db_html_examples_from_s_sense(sense),
         )
         senses.append(db_sense)
     return senses
@@ -73,12 +73,12 @@ async def create_db_word(session: AsyncSession, word: CoreSWord, is_public: bool
     db_word = Word(word=word.word)
     db_word.aliases = [Alias(alias=word.alias)]
     if is_public:
-        db_word.senses = get_db_senses_from_s_public_word(word)
+        db_word.senses = _get_db_senses_from_s_public_word(word)
     else:
         raise NotImplemented("Not implemented yet")
     db_word.sound_uk = word.sound_uk
     db_word.sound_us = word.sound_us
-    db_word.word_images = get_db_word_images_from_s_public_word(word)
+    db_word.word_images = _get_db_word_images_from_s_public_word(word)
     session.add(db_word)
     await session.commit()
     return db_word
@@ -107,7 +107,7 @@ async def create_or_supplement_db_public_word(
     if not db_word:
         return await create_db_word(session, word, is_public=True)
 
-    db_senses: list[Sense] = get_db_senses_from_s_public_word(word)
+    db_senses: list[Sense] = _get_db_senses_from_s_public_word(word)
     for db_sense in db_senses:
         if not await find_public_db_sense_by_definition(session, db_sense.definition):
             db_sense.word_id = db_word.id
