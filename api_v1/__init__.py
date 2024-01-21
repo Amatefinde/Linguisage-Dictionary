@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 
-from .public_word import router as public_word_router
+from .public import router as public_router
+from .personalize import router as personalize_router
 
 __all__ = ["router"]
 
 router = APIRouter(prefix="/api/v1")
-router.include_router(public_word_router)
+router.include_router(public_router)
+router.include_router(personalize_router)
