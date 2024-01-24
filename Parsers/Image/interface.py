@@ -1,16 +1,15 @@
+from abc import ABC, abstractmethod
 import json
 from json.decoder import JSONDecodeError
 from loguru import logger
-from seleniumbase import Driver
-
-from core.config import settings
+from core import settings
 
 
 class GetImageLinksError(Exception):
     pass
 
 
-class SeleniumBaseImgCollector:
+class SeleniumCollectorAbstract(ABC):
     def __init__(self):
         self.driver = None
 
@@ -26,21 +25,14 @@ class SeleniumBaseImgCollector:
             logger.error(json_as_text)
             raise GetImageLinksError("Could not get image links")
 
+    @abstractmethod
     def get_images_url_by_query(self, query: str, amount: int = 10) -> list[str]:
-        self.driver.get(f"{settings.IMAGE_PROVIDER1_URL}?query={query}&perPage={amount}")
-        json_as_text: str = self.driver.get_text("body")
-        return self._parse_images_links(json_as_text)
+        pass
 
+    @abstractmethod
     def __enter__(self):
-        self.driver = Driver(uc=True, headless2=True, disable_js=True)
-        logger.info("Selenium base image collector started")
+        pass
 
+    @abstractmethod
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.driver.quit()
-        logger.info("Selenium base image collector closed")
-
-
-if __name__ == "__main__":
-    collector = SeleniumBaseImgCollector()
-    with collector:
-        logger.info(collector.get_images_url_by_query("ethic"))
+        pass
