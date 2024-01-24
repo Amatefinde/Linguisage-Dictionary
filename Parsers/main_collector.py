@@ -5,7 +5,7 @@ from pathlib import Path
 from os.path import join
 from typing import NamedTuple, TYPE_CHECKING
 
-from Parsers.Image import SeleniumBaseImgCollector
+from Parsers.Image import SeleniumImgCollector
 from Parsers.Dictionary import get_words
 from Parsers.Downloader import download_one, download_many
 from core import settings
@@ -48,13 +48,13 @@ class WordNotExist(Exception):
 async def collect_and_download_one(
     session: ClientSession,
     query: str,
-    collector: SeleniumBaseImgCollector | None = None,
+    collector: SeleniumImgCollector | None = None,
     amount_images: int = 15,
 ) -> CoreSWord:
     if collector:
         images_urls: list[str] = collector.get_images_url_by_query(query, amount_images)
     else:
-        collector = SeleniumBaseImgCollector()
+        collector = SeleniumImgCollector()
         with collector:
             images_urls: list[str] = collector.get_images_url_by_query(query, amount_images)
 
