@@ -50,5 +50,5 @@ async def find_many_and_save_to_db(words: Iterable[str], start: int = None) -> N
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())
-                await asyncio.sleep(15)
+                await asyncio.sleep(25)
                 await find_and_save_to_db(word, image_collector)
