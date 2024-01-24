@@ -9,7 +9,7 @@ from core.database import db_helper
 from core.schemas import CoreSWord
 from api_v1.public import crud
 from Parsers.main_collector import collect_and_download_one, WordNotExist
-from Parsers import SeleniumBaseImgCollector, GetImageLinksError
+from Parsers import SeleniumImgCollector, GetImageLinksError
 from fake_useragent import UserAgent
 
 
@@ -20,7 +20,7 @@ async def get_aiohttp_session():
 
 async def find_and_save_to_db(
     query: str,
-    collector: SeleniumBaseImgCollector,
+    collector: SeleniumImgCollector,
 ) -> None:
     async with await get_aiohttp_session() as aiohttp_session:
         try:
@@ -39,7 +39,7 @@ async def find_and_save_to_db(
 
 
 async def find_many_and_save_to_db(words: Iterable[str], start: int = None) -> None:
-    image_collector = SeleniumBaseImgCollector()
+    image_collector = SeleniumImgCollector()
     with image_collector:
         for idx, word in enumerate(words[start:], start):
             logger.info((idx, word))
@@ -50,5 +50,5 @@ async def find_many_and_save_to_db(words: Iterable[str], start: int = None) -> N
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())
-                await asyncio.sleep(5)
+                await asyncio.sleep(15)
                 await find_and_save_to_db(word, image_collector)
