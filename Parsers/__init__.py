@@ -1,1 +1,1 @@
-from .Image import SeleniumBaseImgCollector, GetImageLinksError
+from .Image import SeleniumImgCollector, GetImageLinksError
