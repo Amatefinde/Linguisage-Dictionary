@@ -12,5 +12,7 @@ def make_static_folder():
         os.mkdir(settings.STATIC_PATH)
     if not os.path.exists(join(settings.STATIC_PATH, "word_images")):
         os.mkdir(join(settings.STATIC_PATH, "word_images"))
+    if not os.path.exists(join(settings.STATIC_PATH, "sense_images")):
+        os.mkdir(join(settings.STATIC_PATH, "sense_images"))
     if not os.path.exists(join(settings.STATIC_PATH, "word_audio")):
         os.mkdir(join(settings.STATIC_PATH, "word_audio"))
