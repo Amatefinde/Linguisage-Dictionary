@@ -29,8 +29,11 @@ class Sense(Base):
     sense_images: Mapped[list["SenseImage"]] = relationship(
         back_populates="sense", cascade="all, delete-orphan"
     )
-    examples: Mapped[list["Example"]] = relationship(back_populates="sense")
-    html_examples: Mapped[list["HtmlExample"]] = relationship(back_populates="sense")
-
+    examples: Mapped[list["Example"]] = relationship(
+        back_populates="sense", cascade="all, delete-orphan"
+    )
+    html_examples: Mapped[list["HtmlExample"]] = relationship(
+        back_populates="sense", cascade="all, delete-orphan"
+    )
     word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
     word: Mapped["Word"] = relationship(back_populates="senses")
