@@ -24,6 +24,7 @@ cloudscraper = "^1.2.71"
 fake-useragent = "^1.4.0"
 python-multipart = "^0.0.6"
 botasaurus = "^3.2.3"
+pillow = "^10.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
