@@ -26,6 +26,7 @@ class Settings(BaseSettings):
 
     MICROSERVICE_NAME: str
     STATIC_PATH: Path
+    PROJECT_DIR: str = str(Path(os.path.dirname(__file__)).parent)
 
     URL_TO_WORD_LIST: str
     DICTIONARY_BASE_URL: str
