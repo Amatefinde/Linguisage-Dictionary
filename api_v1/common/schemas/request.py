@@ -7,5 +7,5 @@ class SRequestSense(BaseModel):
     sense_image_ids: set[int] | None = []
 
 
-class SRequestManySense(BaseModel):
+class SRequestManySenseWithContent(BaseModel):
     senses: list[SRequestSense]
