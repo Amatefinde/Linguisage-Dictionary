@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 from pydantic import BaseModel, Field
 
@@ -18,12 +18,12 @@ class Example(BaseModel):
 
 
 class Sense(BaseModel):
-    lvl: Optional[str]
-    short_cut: str
+    lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None
+    short_cut: str | None = None
     word_id: int = Field(exclude=True)
     is_public: bool
     definition: str
-    part_of_speech: str
+    part_of_speech: str | None = None
     id: int
     examples: List[Example]
 
