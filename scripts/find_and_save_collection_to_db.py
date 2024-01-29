@@ -28,7 +28,7 @@ async def find_and_save_to_db(
                 aiohttp_session, query=query, collector=collector
             )
         except GetImageLinksError:
-            await asyncio.sleep(2)
+            await asyncio.sleep(15)
             logger.error(query)
             core_word: CoreSWord = await collect_and_download_one(
                 aiohttp_session, query=query, collector=collector
