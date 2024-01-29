@@ -7,7 +7,7 @@ from loguru import logger
 
 from core.database import db_helper
 from core.schemas import CoreSWord
-from api_v1.public import crud
+from core.database import create_or_supplement_db_public_word
 from Parsers.main_collector import collect_and_download_one, WordNotExist
 from Parsers import SeleniumImgCollector, GetImageLinksError
 from fake_useragent import UserAgent
@@ -35,7 +35,7 @@ async def find_and_save_to_db(
             )
         async with db_helper.session_factory() as db_session:
             async with db_session.begin():
-                await crud.create_or_supplement_db_public_word(db_session, core_word)
+                await create_or_supplement_db_public_word(db_session, core_word)
 
 
 async def find_many_and_save_to_db(words: Iterable[str], start: int = 0) -> None:

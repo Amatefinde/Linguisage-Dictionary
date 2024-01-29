@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     IMAGE_PROVIDER1_URL: str
     IMAGE_PROVIDER_HOSTNAME: str
 
+    REDIS_URL: str
+
     ADMIN_PASSWORD: str
     SESSION_SECRET: str
 
