@@ -38,7 +38,7 @@ async def find_and_save_to_db(
                 await crud.create_or_supplement_db_public_word(db_session, core_word)
 
 
-async def find_many_and_save_to_db(words: Iterable[str], start: int = None) -> None:
+async def find_many_and_save_to_db(words: Iterable[str], start: int = 0) -> None:
     image_collector = SeleniumImgCollector()
     with image_collector:
         for idx, word in enumerate(words[start:], start):
