@@ -1,6 +1,11 @@
 import asyncio
+
+from loguru import logger
+
 from scripts import find_many_and_save_to_db
 from os import path
+
+logger.add("mnogo_ochen_slov.log")
 
 
 def clear_words(words: list[str]) -> list[str]:
