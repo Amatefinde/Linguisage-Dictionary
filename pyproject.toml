@@ -29,6 +29,7 @@ sqladmin = {extras = ["itsdangerous"], version = "^0.16.0"}
 itsdangerous = "^2.1.2"
 bcrypt = "^4.1.2"
 celery = "^5.3.6"
+redis = "^5.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
