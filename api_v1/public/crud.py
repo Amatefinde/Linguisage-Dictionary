@@ -1,8 +1,10 @@
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from core.database.models import Word, Example, Sense, HtmlExample, Alias, WordImage
+
+from core.database.models import Word, Example, Sense, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
+from .schemas import SResponse
 
 
 async def get_word_by_id(
@@ -31,16 +33,9 @@ async def get_word_by_alias(
 
 def _get_db_examples_from_s_sense(sense: CoreSSense) -> list[Example]:
     db_examples = []
-    for example in sense.examples:
-        db_examples.append(Example(example=example))
+    for example, html_example in zip(sense.examples, sense.html_examples):
+        db_examples.append(Example(example=example, html_example=html_example))
     return db_examples
-
-
-def _get_db_html_examples_from_s_sense(sense: CoreSSense) -> list[HtmlExample]:
-    db_html_examples = []
-    for html_example in sense.html_examples:
-        db_html_examples.append(HtmlExample(html_example=html_example))
-    return db_html_examples
 
 
 def _get_db_word_images_from_s_public_word(word: CoreSWord) -> list[WordImage]:
@@ -60,7 +55,6 @@ def _get_db_senses_from_s_public_word(word: CoreSWord) -> list[Sense]:
             definition=sense.definition,
             short_cut=sense.short_cut,
             examples=_get_db_examples_from_s_sense(sense),
-            html_examples=_get_db_html_examples_from_s_sense(sense),
         )
         senses.append(db_sense)
     return senses
@@ -122,8 +116,8 @@ async def get_full_word(session: AsyncSession, alias: str):
             joinedload(Alias.word),
             joinedload(Alias.word, Word.word_images),
             joinedload(Alias.word, Word.senses),
-            joinedload(Alias.word, Word.senses, Sense.html_examples),
+            joinedload(Alias.word, Word.senses, Sense.examples),
         )
     )
     row_response = await session.execute(stmt)
-    return row_response.scalar()
+    return SResponse.model_validate(row_response.scalar(), from_attributes=True)

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
 
 from core import settings
-from core.database.models import Sense, Word, Example, Alias, HtmlExample, SenseImage
+from core.database.models import Sense, Word, Example, Alias, SenseImage
 from api_v1.public.crud import get_word_by_alias
 from .schemas import SPersonalizeSense, SRequestUpdatePersonalSense
 
@@ -19,7 +19,6 @@ async def get_db_sense_with_all_field(session: AsyncSession, sense_id: int) -> S
         sense_id,
         options=[
             selectinload(Sense.sense_images),
-            selectinload(Sense.html_examples),
             selectinload(Sense.examples),
         ],
     )
@@ -36,8 +35,9 @@ async def add_sense(
         session.add(db_word)
         db_alias = Alias(alias=personalize_sense.word, word=db_word)
         session.add(db_alias)
-    db_examples = [Example(example=example) for example in personalize_sense.examples]
-    db_html_examples = [HtmlExample(html_example=example) for example in personalize_sense.examples]
+    db_examples = [
+        Example(example=example, html_example=example) for example in personalize_sense.examples
+    ]
     db_images = [SenseImage(img=img, is_public=False) for img in personalize_sense.image_filenames]
     db_sense = Sense(
         word=db_word,
@@ -45,7 +45,6 @@ async def add_sense(
         definition=personalize_sense.definition,
         is_public=False,
         examples=db_examples,
-        html_examples=db_html_examples,
         sense_images=db_images,
     )
     session.add(db_sense)
@@ -82,8 +81,9 @@ async def update_definition_part_of_sense_examples(
     if new_fields.part_of_speech:
         sense.part_of_speech = new_fields.part_of_speech
     if new_fields.examples:
-        sense.examples = [Example(example=example) for example in new_fields.examples]
-        sense.html_examples = [HtmlExample(html_example=exm) for exm in new_fields.examples]
+        sense.examples = [
+            Example(example=example, html_example=example) for example in new_fields.examples
+        ]
     await session.commit()
     await session.refresh(sense)
 

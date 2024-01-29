@@ -2,7 +2,7 @@ from loguru import logger
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from core.database.models import Word, SenseImage, Example, Sense, HtmlExample, Alias, WordImage
+from core.database.models import Word, SenseImage, Example, Sense, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
 from utils import async_timer
 from .schemas import SRequestSense, SRequestManySenseWithContent, SResponseSense, SWordImage
@@ -21,7 +21,7 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
     stmt = (
         select(Sense)
         .options(
-            joinedload(Sense.html_examples),
+            joinedload(Sense.examples),
             joinedload(Sense.word),
             joinedload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
         )
