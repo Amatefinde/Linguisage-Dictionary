@@ -38,17 +38,32 @@ async def find_and_save_to_db(
                 await create_or_supplement_db_public_word(db_session, core_word)
 
 
-async def find_many_and_save_to_db(words: Iterable[str], start: int = 0) -> None:
+async def __find_many_and_save_to_db(words: Iterable[str], start: int = 0) -> int | None:
     image_collector = SeleniumImgCollector()
     with image_collector:
         for idx, word in enumerate(words[start:], start):
             logger.info((idx, word))
             try:
                 await find_and_save_to_db(word, image_collector)
+                start += 1
             except WordNotExist:
                 logger.info(f"Word by query {word} not found in dictionary")
             except Exception as Ex:
                 logger.error(Ex)
                 logger.error(traceback.format_exc())
+
                 await asyncio.sleep(50)
-                await find_and_save_to_db(word, image_collector)
+                return start
+
+
+async def find_many_and_save_to_db(words: Iterable[str], start: int = 0, max_retry_count=3) -> None:
+    loop_counter = 0
+    while start is not None:
+        prev_start = start
+        start = await __find_many_and_save_to_db(words, start)
+        if prev_start == start:
+            loop_counter += 1
+        else:
+            loop_counter = 0
+        if loop_counter > max_retry_count:
+            raise Exception(f"Something went wrong...")
