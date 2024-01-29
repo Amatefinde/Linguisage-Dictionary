@@ -19,8 +19,9 @@ class WordModel(BaseModel):
     id: int
 
 
-class HtmlExampleModel(BaseModel):
-    html_example: str
+class ExampleModel(BaseModel):
+    html_example: str | None = None
+    example: str
     sense_id: int = Field(exclude=True)
     id: int
 
@@ -35,7 +36,7 @@ class SResponseSense(BaseModel):
     definition: str | None = None
     word_images: list[SWordImage] | None = []
     word: WordModel
-    html_examples: list[HtmlExampleModel]
+    examples: list[ExampleModel]
 
     model_config = ConfigDict(from_attributes=True)
 
