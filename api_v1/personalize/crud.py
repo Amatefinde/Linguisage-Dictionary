@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload, joinedload
 
 from core import settings
 from core.database.models import Sense, Word, Example, Alias, SenseImage
-from api_v1.public.crud import get_word_by_alias
+from core.database.create_or_supplement_word import get_word_by_alias
 from .schemas import SPersonalizeSense, SRequestUpdatePersonalSense
 
 
