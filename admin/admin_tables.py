@@ -9,12 +9,12 @@ def _get_all_field_names(model) -> list[str]:
 
 
 class WordAdmin(ModelView, model=Word):
-    column_list = [Word.id, Word.word, Word.senses]
+    column_list = [Word.id, Word.word, Word.senses, Word.aliases]
     can_view_details = True
 
 
 class SenseAdmin(ModelView, model=Sense):
-    column_list = _get_all_field_names(Sense)
+    column_list = _get_all_field_names(Sense) + [Sense.word]
     can_view_details = True
     column_sortable_list = _get_all_field_names(Sense)
     column_default_sort = ("id", True)
