@@ -1,6 +1,7 @@
 from typing import List, Optional, Literal
+from pydantic import BaseModel, Field, validator, field_validator
 
-from pydantic import BaseModel, Field
+from core import settings
 
 
 class WordImage(BaseModel):
@@ -8,6 +9,11 @@ class WordImage(BaseModel):
     word_id: int = Field(exclude=True)
     id: int
     img: str
+
+    @field_validator("img")
+    @classmethod
+    def make_url(cls, img: str):
+        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}/{img}"
 
 
 class Example(BaseModel):
