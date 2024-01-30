@@ -44,3 +44,6 @@ class WordImage(Base):
 
     word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
     word: Mapped["Word"] = relationship(back_populates="word_images")
+
+    def __str__(self):
+        return self.img
