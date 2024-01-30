@@ -13,7 +13,7 @@ async def get_full_word(session: AsyncSession, alias: str):
         .options(
             joinedload(Alias.word),
             joinedload(Alias.word, Word.word_images),
-            joinedload(Alias.word, Word.senses),
+            joinedload(Alias.word, Word.senses.and_(Sense.is_public is True)),
             joinedload(Alias.word, Word.senses, Sense.examples),
         )
     )
