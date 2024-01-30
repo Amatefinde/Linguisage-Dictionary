@@ -12,3 +12,6 @@ class Example(Base):
     html_example: Mapped[str | None] = None
     sense: Mapped["Sense"] = relationship(back_populates="examples")
     sense_id: Mapped["int"] = mapped_column(ForeignKey("sense.id"))
+
+    def __str__(self):
+        return self.example
