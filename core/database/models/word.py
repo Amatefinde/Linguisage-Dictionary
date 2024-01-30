@@ -14,8 +14,8 @@ class Alias(Base):
     word: Mapped["Word"] = relationship(back_populates="aliases")
     word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
 
-    def __repr__(self):
-        return f"Alias: {self.alias}, Word: {self.word}"
+    def __str__(self):
+        return self.alias
 
 
 class Word(Base):
@@ -33,6 +33,9 @@ class Word(Base):
     word_images: Mapped[list["WordImage"]] = relationship(
         back_populates="word", cascade="all, delete-orphan"
     )
+
+    def __str__(self):
+        return self.word
 
 
 class WordImage(Base):
