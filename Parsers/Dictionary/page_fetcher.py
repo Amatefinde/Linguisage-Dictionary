@@ -30,7 +30,7 @@ async def _find_page_in_dictionary(session: ClientSession, query: str) -> str | 
     params = {"q": query}
     async with session.get(SEARCH_DICTIONARY_URL, params=params, headers=headers) as response:
         row_html: str = await response.text()
-        if "headword" in row_html:
+        if '"class="headword"' in row_html:
             return urlparse(str(response.url)).path
 
 
