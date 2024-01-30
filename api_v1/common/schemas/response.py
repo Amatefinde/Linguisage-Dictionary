@@ -1,7 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel, Field, ConfigDict, field_validator
-
+from os.path import join
 from core import settings
 
 
@@ -14,7 +14,8 @@ class SWordImage(BaseModel):
     @field_validator("img")
     @classmethod
     def make_url(cls, img: str):
-        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}/{img}"
+        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}\
+        /{join('static','word_images', img)}"
 
     model_config = ConfigDict(from_attributes=True)
 

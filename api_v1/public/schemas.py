@@ -1,3 +1,4 @@
+from os.path import join
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, validator, field_validator
 
@@ -13,7 +14,8 @@ class WordImage(BaseModel):
     @field_validator("img")
     @classmethod
     def make_url(cls, img: str):
-        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}/{img}"
+        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}\
+        /{join('static','word_images', img)}"
 
 
 class Example(BaseModel):
