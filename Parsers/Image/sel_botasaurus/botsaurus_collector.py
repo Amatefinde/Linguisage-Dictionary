@@ -24,6 +24,7 @@ class SeleniumBotsaurusImgCollector(SeleniumCollectorAbstract):
             headless=True,
             add_arguments=add_arguments,
             close_on_crash=True,
+            output=lambda x, y: None,
         )
         def scrape(driver: AntiDetectDriver, link):
             driver.get(link)
