@@ -14,8 +14,8 @@ class WordImage(BaseModel):
     @field_validator("img")
     @classmethod
     def make_url(cls, img: str):
-        return f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}\
-        /{join('static','word_images', img)}"
+        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
+        return f"{domain}/{join('static','word_images', img)}"
 
 
 class Example(BaseModel):
