@@ -25,7 +25,7 @@ fake-useragent = "^1.4.0"
 python-multipart = "^0.0.6"
 botasaurus = "^3.2.3"
 pillow = "^10.2.0"
-sqladmin = {extras = ["itsdangerous"], version = "^0.16.0"}
+sqladmin = {extras = ["full"], version = "^0.16.0"}
 itsdangerous = "^2.1.2"
 bcrypt = "^4.1.2"
 celery = "^5.3.6"

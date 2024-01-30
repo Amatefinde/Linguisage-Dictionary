@@ -2061,6 +2061,7 @@ files = [
 ]
 
 [package.dependencies]
+itsdangerous = {version = "*", optional = true, markers = "extra == \"full\""}
 jinja2 = "*"
 python-multipart = "*"
 sqlalchemy = ">=1.4"
@@ -2474,4 +2475,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "21be9e89c2dde9dbb5b0d10d36787080d605e5f2bb5ef452a655fe5b9f6fbc26"
+content-hash = "21274f9cdc74cf0097e9c41f6d1b8a34587bd169d08034e01dedc59211fc4819"
