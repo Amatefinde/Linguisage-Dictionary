@@ -44,7 +44,11 @@ async def get_random(
     additional_part_of_speeches = SAdditionalPOSs()
     for part_of_speech in picked_part_of_speeches:
         additional_senses = await crud.get_random_senses(
-            session, amount * 4, lvl, [part_of_speech], picked_senses_ids
+            session,
+            amount if amount > 15 else amount * 3,
+            lvl,
+            [part_of_speech],
+            picked_senses_ids,
         )
         setattr(additional_part_of_speeches, part_of_speech, additional_senses)
 
