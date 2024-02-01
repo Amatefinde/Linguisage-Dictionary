@@ -7,3 +7,5 @@ celery = Celery(
     broker=settings.REDIS_URL,
     include=["background_tasks.tasks"],
 )
+
+celery.conf.task_default_queue = "dictionary"
