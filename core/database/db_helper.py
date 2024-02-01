@@ -28,8 +28,8 @@ class DataBaseHelper:
         return session
 
     async def session_dependency(self) -> AsyncSession:
-        session = self.get_scoped_session()
-        yield session
+        async with self.session_factory() as session:
+            yield session
         await session.aclose()
 
 
