@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class Alias(Base):
-    alias: Mapped[str] = mapped_column(unique=True)
+    alias: Mapped[str] = mapped_column(unique=True, index=True)
 
     word: Mapped["Word"] = relationship(back_populates="aliases")
     word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
