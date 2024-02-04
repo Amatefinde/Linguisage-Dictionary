@@ -31,7 +31,7 @@ class Sense(Base):
     examples: Mapped[list["Example"]] = relationship(
         back_populates="sense", cascade="all, delete-orphan"
     )
-    word_id: Mapped[int] = mapped_column(ForeignKey("word.id"), index=True)
+    word_id: Mapped[int] = mapped_column(ForeignKey("word.id"))
     word: Mapped["Word"] = relationship(back_populates="senses")
 
     def __str__(self):
