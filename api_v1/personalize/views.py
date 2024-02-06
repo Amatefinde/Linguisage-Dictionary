@@ -16,7 +16,7 @@ from utils.image_processing import base64_strings_to_images, save_images
 router = APIRouter(tags=["Personalize"], prefix="/personalize")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def add_custom_sense(
     add_sense_request: SRequestAddPersonalizeSense,
     session: AsyncSession = Depends(db_helper.session_dependency),
@@ -30,7 +30,7 @@ async def add_custom_sense(
     return db_sense
 
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_personalize_sense(
     db_sense_personalize_with_images: Annotated[
         Sense, Depends(get_personalize_sense_with_all_field)
@@ -40,7 +40,7 @@ async def delete_personalize_sense(
     await crud.delete_personalize_sense(session, db_sense_personalize_with_images)
 
 
-@router.patch("/", status_code=status.HTTP_200_OK)
+@router.patch("", status_code=status.HTTP_200_OK)
 async def delete_personalize_sense(
     db_sense_personalize_with_images: Annotated[
         Sense, Depends(get_personalize_sense_with_all_field)
