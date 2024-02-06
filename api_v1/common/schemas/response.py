@@ -4,9 +4,8 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator
 from core.schemas import BuildImgUrlMixin, BuildSoundUrlsMixin
 
 
-class SWordImage(BuildImgUrlMixin, BaseModel):
+class SImage(BuildImgUrlMixin, BaseModel):
     img: str
-    word_id: int = Field(exclude=True)
     is_public: bool
     id: int
 
@@ -33,7 +32,8 @@ class SResponseSense(BaseModel):
     lvl: Literal["A1", "A2", "B1", "B2", "C1", "C2"] | None
     is_public: bool
     definition: str | None = None
-    word_images: list[SWordImage] | None = []
+    word_images: list[SImage] | None = []
+    sense_images: list[SImage]
     word: WordModel
     examples: list[ExampleModel]
 
