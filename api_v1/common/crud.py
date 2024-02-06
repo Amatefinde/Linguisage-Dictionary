@@ -5,7 +5,7 @@ from sqlalchemy import select
 from core.database.models import Word, SenseImage, Example, Sense, Alias, WordImage
 from core.schemas.schemas import CoreSWord, CoreSSense
 from utils import async_timer
-from .schemas import SRequestSense, SRequestManySenseWithContent, SResponseSense, SWordImage
+from .schemas import SRequestSense, SRequestManySenseWithContent, SResponseSense, SImage
 
 
 @async_timer
@@ -24,9 +24,11 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
             joinedload(Sense.examples),
             joinedload(Sense.word),
             joinedload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
+            joinedload(Sense.sense_images.and_(SenseImage.id.in_(sense_image_ids))),
         )
         .join(Word, Sense.word_id == Word.id)
         .join(WordImage, WordImage.word_id == Word.id)
+        .join(SenseImage, SenseImage.sense_id == Sense.id)
         .where(Sense.id.in_(senses_map))
     )
     row_response = await session.execute(stmt)
@@ -34,7 +36,7 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
     for sense in row_response.unique().mappings().all():
         ready_sense = SResponseSense.model_validate(sense["Sense"], from_attributes=True)
         ready_sense.word_images = [
-            SWordImage.model_validate(image, from_attributes=True)
+            SImage.model_validate(image, from_attributes=True)
             for image in sense.Sense.word.word_images
             if image.id in senses_map[sense.Sense.id].word_image_ids  # keep only requested img
         ]

@@ -1,2 +1,2 @@
 from .request import SRequestSense, SRequestManySenseWithContent
-from .response import SResponseSense, SWordImage, SResponseSenses
+from .response import SResponseSense, SImage, SResponseSenses
