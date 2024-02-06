@@ -15,7 +15,7 @@ class BaseWithConf(BaseModel):
 class WordImage(BaseWithConf, BuildImgUrlMixin):
     is_public: bool
     word_id: int = Field(exclude=True)
-    id: int
+    id: int = Field(serialization_alias="f_image_id")
     img: str
 
 
@@ -30,7 +30,7 @@ class Sense(BaseWithConf):
     is_public: bool
     definition: str
     part_of_speech: str | None = None
-    id: int
+    id: int = Field(serialization_alias="f_sense_id")
     lvl: level_type | None = None
     short_cut: str | None = None
     word_id: int = Field(exclude=True)
@@ -45,7 +45,7 @@ class Alias(BaseWithConf):
 
 class SWordResponse(BaseWithConf, BuildSoundUrlsMixin):
     word: str
-    id: int
+    id: int = Field(serialization_alias="f_word_id")
     sound_uk: str | None = None
     sound_us: str | None = None
     word_images: List[WordImage]
@@ -60,7 +60,7 @@ class Word(BaseWithConf, BuildSoundUrlsMixin):
     word: str
     sound_us: str | None = None
     sound_uk: str | None = None
-    id: int
+    id: int = Field(serialization_alias="f_word_id")
     word_images: List[WordImage] | None = None
 
 
@@ -68,7 +68,7 @@ class SPickedRandomSense(BaseWithConf):
     is_public: bool
     definition: str
     part_of_speech: str | None = None
-    id: int
+    id: int = Field(serialization_alias="f_sense_id")
     lvl: level_type | None = None
     short_cut: str | None = None
     word_id: int = Field(exclude=True)
@@ -80,14 +80,14 @@ class SAdditionalRandomWord(BaseWithConf, BuildSoundUrlsMixin):
     word: str
     sound_us: str | None = None
     sound_uk: str | None = None
-    id: int
+    id: int = Field(serialization_alias="f_word_id")
 
 
 class SAdditionalRandomSense(BaseWithConf):
     is_public: bool
     definition: str
     part_of_speech: str | None = None
-    id: int
+    id: int = Field(serialization_alias="f_sense_id")
     lvl: level_type | None = None
     short_cut: str | None = Field(default=None, exclude=True)
     word_id: int = Field(exclude=True)
