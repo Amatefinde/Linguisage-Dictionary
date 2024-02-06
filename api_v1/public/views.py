@@ -20,6 +20,7 @@ async def get_by_alias(
     query: str,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    query = query.lower()
     response: SWordResponse = await crud.get_full_word(session, query)
     if not response:
         find_and_add_world.delay(query)
