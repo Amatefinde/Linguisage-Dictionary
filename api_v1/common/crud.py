@@ -34,7 +34,7 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
     for sense in row_response.unique().mappings().all():
         ready_sense = SResponseSense.model_validate(sense["Sense"], from_attributes=True)
         ready_sense.word_images = [
-            SWordImage.model_validate(image)
+            SWordImage.model_validate(image, from_attributes=True)
             for image in sense.Sense.word.word_images
             if image.id in senses_map[sense.Sense.id].word_image_ids  # keep only requested img
         ]

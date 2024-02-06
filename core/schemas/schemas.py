@@ -1,6 +1,32 @@
+from os.path import join
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, field_serializer
+
+from core import settings
+
+
+class BuildSoundUrlsMixin(BaseModel):
+    @field_serializer("sound_uk", check_fields=False)
+    def build_sound_uk_url(self, sound_uk: str | None):
+        if sound_uk is None:
+            return None
+        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
+        return f"{domain}/{join('static','word_audio', sound_uk)}"
+
+    @field_serializer("sound_us", check_fields=False)
+    def build_sound_us_url(self, sound_us: str | None):
+        if sound_us is None:
+            return None
+        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
+        return f"{domain}/{join('static','word_audio', sound_us)}"
+
+
+class BuildImgUrlMixin(BaseModel):
+    @field_serializer("img", check_fields=False)
+    def make_url(self, img: str):
+        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
+        return f"{domain}/{join('static','word_images', img)}"
 
 
 class CoreSSense(BaseModel):

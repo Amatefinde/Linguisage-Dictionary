@@ -1,26 +1,22 @@
 from os.path import join
 from typing import List, Optional, Literal
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 
 from core import settings
 from core.types import level_type
+
+from core.schemas import BuildSoundUrlsMixin, BuildImgUrlMixin
 
 
 class BaseWithConf(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class WordImage(BaseWithConf):
+class WordImage(BaseWithConf, BuildImgUrlMixin):
     is_public: bool
     word_id: int = Field(exclude=True)
     id: int
     img: str
-
-    @field_validator("img")
-    @classmethod
-    def make_url(cls, img: str):
-        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
-        return f"{domain}/{join('static','word_images', img)}"
 
 
 class Example(BaseWithConf):
@@ -47,7 +43,7 @@ class Alias(BaseWithConf):
     id: int
 
 
-class SWordResponse(BaseWithConf):
+class SWordResponse(BaseWithConf, BuildSoundUrlsMixin):
     word: str
     id: int
     sound_uk: str | None = None
@@ -60,7 +56,7 @@ class SWordResponse(BaseWithConf):
 ########################
 
 
-class Word(BaseWithConf):
+class Word(BaseWithConf, BuildSoundUrlsMixin):
     word: str
     sound_us: str | None = None
     sound_uk: str | None = None
@@ -80,7 +76,7 @@ class SPickedRandomSense(BaseWithConf):
     examples: List[Example] | None = Field()
 
 
-class SAdditionalRandomWord(BaseWithConf):
+class SAdditionalRandomWord(BaseWithConf, BuildSoundUrlsMixin):
     word: str
     sound_us: str | None = None
     sound_uk: str | None = None

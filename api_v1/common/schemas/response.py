@@ -1,26 +1,17 @@
 from typing import Literal
-
 from pydantic import BaseModel, Field, ConfigDict, field_validator
-from os.path import join
-from core import settings
+
+from core.schemas import BuildImgUrlMixin, BuildSoundUrlsMixin
 
 
-class SWordImage(BaseModel):
+class SWordImage(BuildImgUrlMixin, BaseModel):
     img: str
     word_id: int = Field(exclude=True)
     is_public: bool
     id: int
 
-    @field_validator("img")
-    @classmethod
-    def make_url(cls, img: str):
-        domain = f"{settings.SERVER_PROTOCOL}://{settings.SERVER_HOST}:{settings.SERVER_PORT}"
-        return f"{domain}/{join('static','word_images', img)}"
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class WordModel(BaseModel):
+class WordModel(BuildSoundUrlsMixin, BaseModel):
     word: str
     sound_us: str
     sound_uk: str
