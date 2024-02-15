@@ -7,7 +7,7 @@ from aiohttp import TCPConnector
 from aiohttp.client import ClientSession
 from aiohttp.client import ClientTimeout
 
-from . import find_many_and_save_to_db
+from scripts import find_many_and_save_to_db
 from core.config import settings
 
 
@@ -39,7 +39,7 @@ async def get_aiohttp_session():
     return aiohttp.ClientSession(**aiohttp_session_config)
 
 
-START = 4585
+START = 0
 
 
 async def main(link_to_list):
