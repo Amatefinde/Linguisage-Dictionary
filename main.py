@@ -16,7 +16,7 @@ from admin import (
 
 make_static_folder()
 
-app = FastAPI(title="Linguisage Dictionary!")
+app = FastAPI(title="Linguisage Dictionary!!")
 app.include_router(api_v1_router)
 
 app.mount(
