@@ -10,7 +10,6 @@ from aiohttp.client import ClientTimeout
 from scripts import find_many_and_save_to_db
 from core.config import settings
 
-
 logger.add("oxford5000_test.log")
 
 
@@ -50,4 +49,9 @@ async def main(link_to_list):
         await find_many_and_save_to_db(words, START)
 
 
-asyncio.run(main(settings.URL_TO_WORD_LIST))
+def sync_run():
+    asyncio.run(main(settings.URL_TO_WORD_LIST))
+
+
+if __name__ == "__main__":
+    sync_run()
