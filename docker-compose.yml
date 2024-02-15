@@ -16,6 +16,7 @@ services:
       - ${VOLUME_STATIC}:/linguisage/static
 
 
+
   postgres_db:
     image: postgres:15
     environment:
@@ -25,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ${VOLUME_DB}:/var/lib/postgresql/data
+      - ${VOLUME_POSTGRES}:/var/lib/postgresql/data
 
   redis:
     image: redis:7.2.4
