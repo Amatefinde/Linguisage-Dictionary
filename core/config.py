@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     SERVER_HOST: str
     SERVER_PORT: str
 
-    MICROSERVICE_NAME: str
     STATIC_PATH: Path
     PROJECT_DIR: str = str(Path(os.path.dirname(__file__)).parent)
 
@@ -33,7 +32,7 @@ class Settings(BaseSettings):
     IMAGE_PROVIDER1_URL: str
     IMAGE_PROVIDER_HOSTNAME: str
 
-    REDIS_URL: str
+    REDIS_HOST: str
 
     ADMIN_PASSWORD: str
     SESSION_SECRET: str
