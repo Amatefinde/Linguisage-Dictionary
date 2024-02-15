@@ -21,8 +21,8 @@ ENV YOUR_ENV=${YOUR_ENV} \
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-WORKDIR /dictionary
-COPY poetry.lock pyproject.toml /dictionary/
+WORKDIR /linguisage
+COPY poetry.lock pyproject.toml /linguisage/
 
 
 RUN poetry install
@@ -31,4 +31,4 @@ COPY . .
 
 RUN chmod +x app_entry_point.sh
 
-CMD ["/literature/app_entry_point.sh"]
+CMD ["/linguisage/app_entry_point.sh"]
