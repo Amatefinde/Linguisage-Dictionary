@@ -4,7 +4,7 @@ from core import settings
 
 celery = Celery(
     "dictionary_tasks",
-    broker=settings.REDIS_URL,
+    broker=f"redis://{settings.REDIS_HOST}:6379",
     include=["background_tasks.tasks"],
 )
 
