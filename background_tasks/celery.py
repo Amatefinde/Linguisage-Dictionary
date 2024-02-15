@@ -8,4 +8,4 @@ celery = Celery(
     include=["background_tasks.tasks"],
 )
 
-celery.conf.task_default_queue = "dictionary"
+celery.conf.task_default_queue = "dictionary_queue"
