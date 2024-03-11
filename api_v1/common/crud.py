@@ -23,15 +23,16 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
         .options(
             joinedload(Sense.examples),
             joinedload(Sense.word),
-            joinedload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
-            joinedload(Sense.sense_images.and_(SenseImage.id.in_(sense_image_ids))),
+            selectinload(Sense.word, Word.word_images.and_(WordImage.id.in_(word_image_ids))),
+            selectinload(Sense.sense_images.and_(SenseImage.id.in_(sense_image_ids))),
         )
         .join(Word, Sense.word_id == Word.id)
-        .join(WordImage, WordImage.word_id == Word.id)
-        .join(SenseImage, SenseImage.sense_id == Sense.id)
+        .join(WordImage, WordImage.word_id == Word.id, isouter=True)
+        .join(SenseImage, SenseImage.sense_id == Sense.id, isouter=True)
         .where(Sense.id.in_(senses_map))
     )
     row_response = await session.execute(stmt)
+
     senses_for_response = []
     for sense in row_response.unique().mappings().all():
         ready_sense = SResponseSense.model_validate(sense["Sense"], from_attributes=True)
