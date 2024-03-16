@@ -31,7 +31,9 @@ RUN apt-get update && apt-get -y install google-chrome-stable
 
 RUN poetry install
 
+
 COPY . .
+RUN mkdir "cert"
 COPY /etc/letsencrypt/live/linguisage.ru/fullchain.pem /linguisage/cert/
 COPY /etc/letsencrypt/live/linguisage.ru/privkey.pem /linguisage/cert/
 
