@@ -16,8 +16,6 @@ services:
       - ${VOLUME_STATIC}:/linguisage/static
 #      if u haven't ssl cert just remove this line
       - ${VOLUME_CERT}:/linguisage/cert
-    command:
-      - "/linguisage/app_entry_point.sh"
 
 
 
