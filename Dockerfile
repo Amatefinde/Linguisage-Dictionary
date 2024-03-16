@@ -35,4 +35,3 @@ COPY . .
 
 RUN chmod +x app_entry_point.sh
 
-CMD ["/linguisage/app_entry_point.sh"]
