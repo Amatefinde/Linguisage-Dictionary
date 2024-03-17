@@ -18,7 +18,6 @@ services:
       - ${VOLUME_CERT}:/linguisage/cert
 
 
-
   postgres_db:
     image: postgres:15
     environment:
