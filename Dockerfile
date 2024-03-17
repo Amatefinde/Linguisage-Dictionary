@@ -34,8 +34,8 @@ RUN poetry install
 
 COPY . .
 RUN mkdir "cert"
-COPY ./../../../../etc/letsencrypt/live/linguisage.ru/fullchain.pem /linguisage/cert/fullchain.pem
-COPY ./../../../../etc/letsencrypt/live/linguisage.ru/privkey.pem /linguisage/cert/privkey.pem
+COPY /etc/letsencrypt /linguisage/cert/
+
 
 
 RUN chmod +x app_entry_point.sh
