@@ -33,9 +33,6 @@ RUN poetry install
 
 
 COPY . .
-RUN mkdir "cert"
-COPY /etc/letsencrypt /linguisage/cert/
-
 
 
 RUN chmod +x app_entry_point.sh
