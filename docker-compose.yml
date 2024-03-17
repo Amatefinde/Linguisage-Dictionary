@@ -18,7 +18,6 @@ services:
        #/etc/letsencrypt:/linguisage/letsencrypt
       - ${VOLUME_CERT}:/linguisage/letsencrypt
 
-
   postgres_db:
     image: postgres:15
     environment:
