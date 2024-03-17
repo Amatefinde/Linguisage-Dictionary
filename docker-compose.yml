@@ -15,7 +15,7 @@ services:
     volumes:
       - ${VOLUME_STATIC}:/linguisage/static
 #      if u haven't ssl cert just remove this line
-      - ${VOLUME_CERT}:/linguisage/cert
+#      - ${VOLUME_CERT}:/linguisage/cert
 
 
 
