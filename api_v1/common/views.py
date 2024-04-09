@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import db_helper
 from . import crud
+from core.database import db_helper
 from .schemas import SRequestManySenseWithContent, SResponseSenses
 
 router = APIRouter(prefix="/general", tags=["General"])
