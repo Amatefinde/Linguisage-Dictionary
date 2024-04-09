@@ -30,7 +30,14 @@ async def get_senses_by_ids(session: AsyncSession, request_senses: SRequestManyS
         .join(WordImage, WordImage.word_id == Word.id, isouter=True)
         .join(SenseImage, SenseImage.sense_id == Sense.id, isouter=True)
         .where(Sense.id.in_(senses_map))
+
     )
+    if clauses := request_senses.clauses:
+        if clauses.lvl is not None:
+            stmt = stmt.where(Sense.lvl.in_(request_senses.clauses.lvl))
+        if clauses.search is not None:
+            stmt = stmt.where(Word.word.like(f'%{request_senses.clauses.search}%'))
+
     row_response = await session.execute(stmt)
 
     senses_for_response = []
