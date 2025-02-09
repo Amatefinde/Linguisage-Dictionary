@@ -6,17 +6,19 @@ from aiohttp import ClientSession
 
 async def download_one(url: str, filepath: Path | str, session: ClientSession = None):
     filepath = Path(filepath)
-    file: bytes = await fetch_one(url, session)
-    filepath.write_bytes(file)
+    file: bytes | None = fetch_one(url)
+    if file is not None:
+        filepath.write_bytes(file)
 
 
 async def download_many(
     filenames_and_urls: dict[str, str], pathdir: str, session: ClientSession = None
 ) -> tuple[str, ...]:
     """filenames_and_urls: dict[filename, url]"""
-    files = await fetch_many(filenames_and_urls.values(), session)
+    files = fetch_many(filenames_and_urls.values())
     for idx, filename in enumerate(filenames_and_urls):
-        Path(pathdir, filename).write_bytes(files[idx])
+        if files[idx]:
+            Path(pathdir, filename).write_bytes(files[idx])
     return tuple(filenames_and_urls.keys())
 
 

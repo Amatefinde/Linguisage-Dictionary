@@ -35,6 +35,6 @@ RUN poetry install
 COPY . .
 
 
-RUN chmod +x app_entry_point.sh
+RUN chmod +x app_entry_point_without_ssl.sh
 
 CMD ["/linguisage/app_entry_point.sh"]

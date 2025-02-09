@@ -16,7 +16,7 @@ services:
       - ${VOLUME_STATIC}:/linguisage/static
 #      if u haven't ssl cert just remove this line
        #/etc/letsencrypt:/linguisage/letsencrypt
-      - ${VOLUME_CERT}:/linguisage/letsencrypt
+      # - ${VOLUME_CERT}:/linguisage/letsencrypt
 
   postgres_db:
     image: postgres:15

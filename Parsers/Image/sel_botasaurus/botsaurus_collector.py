@@ -6,6 +6,7 @@ from loguru import logger
 from core import settings
 
 
+
 class SeleniumBotsaurusImgCollector(SeleniumCollectorAbstract):
     def get_images_url_by_query(self, query: str, amount: int = 10) -> list[str]:
         json_as_text: str = self.scrape(

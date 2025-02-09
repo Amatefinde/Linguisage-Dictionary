@@ -1,6 +1,4 @@
-__all__ = ["GetImageLinksError", "SeleniumImgCollector"]
+__all__ = ["GetImageLinksError", "request", "Request"]
 
-from .sel_botasaurus.botsaurus_collector import (
-    SeleniumBotsaurusImgCollector as SeleniumImgCollector,
-)
+from botasaurus.request import request, Request
 from .interface import GetImageLinksError

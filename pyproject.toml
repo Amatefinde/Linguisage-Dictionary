@@ -6,24 +6,20 @@ authors = ["iRespectOnlyYen <MyNameIIIypuk@yandex.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 aiohttp = "^3.9.1"
 beautifulsoup4 = "^4.12.2"
-lxml = "^4.9.3"
+
 python-dotenv = "^1.0.0"
 pydantic = "^2.5.2"
 fastapi = "^0.104.1"
 sqlalchemy = "^2.0.23"
 asyncpg = "^0.29.0"
 pydantic-settings = "^2.1.0"
-pip = "^23.3.1"
+
 alembic = "^1.12.1"
 uvicorn = "^0.24.0.post1"
-loguru = "^0.7.2"
-cloudscraper = "^1.2.71"
-fake-useragent = "^1.4.0"
-python-multipart = "^0.0.6"
-botasaurus = "^3.2.3"
+
 pillow = "^10.2.0"
 sqladmin = {extras = ["full"], version = "^0.16.0"}
 itsdangerous = "^2.1.2"
@@ -31,6 +27,10 @@ bcrypt = "^4.1.2"
 celery = "^5.3.6"
 redis = "^5.0.1"
 flower = "^2.0.1"
+botasaurus = "^4.0.76"
+botasaurus-requests = "^4.0.38"
+loguru = "^0.7.3"
+fake-useragent = "^2.0.3"
 
 
 [tool.poetry.group.dev.dependencies]
