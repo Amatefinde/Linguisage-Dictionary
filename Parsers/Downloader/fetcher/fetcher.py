@@ -19,7 +19,7 @@ def fetch_one(request: Request, url: str) -> bytes | None:
         return response.content
 
     except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 410:
+        if e.response.status_code == 410 or e.response.status_code == 404:
             print(f"Ресурс удален: {url}")
             return None  # Возвращаем None для удаленных ресурсов
         else:
