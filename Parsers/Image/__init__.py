@@ -1,4 +1,3 @@
-__all__ = ["GetImageLinksError", "request", "Request"]
+__all__ = ["GetImageLinksError", ]
 
-from botasaurus.request import request, Request
 from .interface import GetImageLinksError

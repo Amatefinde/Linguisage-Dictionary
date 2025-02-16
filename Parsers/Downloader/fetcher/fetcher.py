@@ -1,38 +1,43 @@
-import requests
-from botasaurus.request import request, Request
+import base64
+from time import sleep
 from typing import Iterable, Sequence
+from seleniumbase import Driver
 
+# Создаем глобальный экземпляр браузера
+driver = Driver(uc=True, headless=True)
 
-
-@request(
-    max_retry=5,  # Максимальное количество повторных попыток
-    retry_wait=3,  # Время ожидания между попытками (в секундах)
-    output=None
-)
-
-def fetch_one(request: Request, url: str) -> bytes | None:
-    try:
-        response = request.get(url)
-        response.raise_for_status()  # Проверяем статус код ответа
-
-        # Если все хорошо, возвращаем содержимое
-        return response.content
-
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 410 or e.response.status_code == 404:
-            print(f"Ресурс удален: {url}")
-            return None  # Возвращаем None для удаленных ресурсов
-        else:
-            print(f"Ошибка при загрузке {url}: {e}")
-            raise  # Повторяем попытку для других ошибок
-
-    except Exception as e:
-        print(f"Неожиданная ошибка при загрузке {url}: {e}")
-        sleep(3)  # Ждем перед повторной попыткой
-        raise
+def fetch_one( url: str) -> bytes | None:
+    max_retry = 5       # Максимальное количество попыток
+    retry_wait = 3      # Ожидание между попытками (сек)
+    for attempt in range(max_retry):
+        try:
+            driver.open(url)
+            # Небольшая задержка для загрузки изображения
+            sleep(1)
+            # Выполняем JS для получения base64-кодированного содержимого изображения
+            js = """
+            var img = document.images[0];
+            if (!img) { return null; }
+            var canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            return canvas.toDataURL('image/png').substring(22);
+            """
+            b64_data = driver.execute_script(js)
+            if b64_data is None:
+                print(f"Ресурс удален или не найден: {url}")
+                return None
+            return base64.b64decode(b64_data)
+        except Exception as e:
+            print(f"Ошибка при загрузке {url} (попытка {attempt+1}): {e}")
+            sleep(retry_wait)
+            if attempt == max_retry - 1:
+                raise
 
 def fetch_many(urls: Iterable[str]) -> Sequence[bytes | None]:
-    # Используем list comprehension для выполнения запросов к каждому URL
+    # Сохраняем интерфейс: функция принимает список URL-ов
     return [fetch_one(url) for url in urls]
 
 def main():
@@ -41,4 +46,7 @@ def main():
     print(f"Successfully fetched {len(results)} images.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        driver.quit()
