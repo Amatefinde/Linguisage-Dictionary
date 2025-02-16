@@ -1,3 +1,5 @@
+from time import sleep
+
 import requests
 from botasaurus.request import request, Request
 from typing import Iterable, Sequence
