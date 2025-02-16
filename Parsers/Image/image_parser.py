@@ -36,7 +36,6 @@ def find_images_by_word(word: str, amount_images: int = 10) -> list[str]:
         html_str = driver.get_page_source()
         response = parse_json(html_str)
         if response:
-            print(response)
             row_image_objs = response["responses"][0]["models"]["image"]
             return [x["_secureLegacyUrlSmall"] for x in row_image_objs]
 
