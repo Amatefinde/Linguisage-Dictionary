@@ -1,87 +1,38 @@
-import base64
-from time import sleep
+import requests
+from botasaurus.request import request, Request
 from typing import Iterable, Sequence
-from seleniumbase import Driver
 
-# Создаем глобальный экземпляр браузера
-driver = Driver(uc=True, headless=True)
 
-def fetch_one(url: str) -> bytes | None:
-    max_retry = 5       # Максимальное количество попыток
-    retry_wait = 3      # Время ожидания между попытками (сек)
-    for attempt in range(max_retry):
-        try:
-            # Открываем URL в браузере
-            driver.open(url)
-            sleep(1)  # небольшая задержка на загрузку ресурса
 
-            # Если URL указывает на аудиофайл
-            if url.lower().endswith(('.mp3', '.wav', '.ogg')):
-                js_audio = """
-                var url = arguments[0];
-                var callback = arguments[arguments.length - 1];
-                fetch(url)
-                  .then(response => { 
-                      if (!response.ok) { 
-                          callback("HTTP_ERROR_" + response.status);
-                          return;
-                      }
-                      return response.blob();
-                  })
-                  .then(blob => {
-                      if(blob === undefined){ return; }
-                      var reader = new FileReader();
-                      reader.onloadend = function() { 
-                          callback(reader.result.split(',')[1]); 
-                      };
-                      reader.onerror = function(e) { callback(null); };
-                      reader.readAsDataURL(blob);
-                  })
-                  .catch(error => { callback(null); });
-                """
-                b64_data = driver.execute_async_script(js_audio, url)
-                if b64_data is None:
-                    print(f"Не удалось загрузить ресурс: {url}")
-                    return None
-                if isinstance(b64_data, str) and b64_data.startswith("HTTP_ERROR_"):
-                    status = int(b64_data.replace("HTTP_ERROR_", ""))
-                    if status in (404, 410):
-                        print(f"Ресурс удален: {url}")
-                        return None
-                    else:
-                        raise Exception(f"HTTP ошибка {status} при загрузке {url}")
-                return base64.b64decode(b64_data)
+@request(
+    max_retry=5,  # Максимальное количество повторных попыток
+    retry_wait=3,  # Время ожидания между попытками (в секундах)
+    output=None
+)
 
-            else:
-                # Предполагаем, что ресурс является изображением
-                js_image = """
-                var callback = arguments[arguments.length - 1];
-                var img = document.images[0];
-                if (!img) { 
-                    callback(null);
-                    return;
-                }
-                var canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                callback(canvas.toDataURL('image/png').substring(22));
-                """
-                b64_data = driver.execute_async_script(js_image)
-                if b64_data is None:
-                    print(f"Не удалось загрузить ресурс: {url}")
-                    return None
-                return base64.b64decode(b64_data)
+def fetch_one(request: Request, url: str) -> bytes | None:
+    try:
+        response = request.get(url)
+        response.raise_for_status()  # Проверяем статус код ответа
 
-        except Exception as e:
-            print(f"Ошибка при загрузке {url} (попытка {attempt+1}): {e}")
-            sleep(retry_wait)
-            if attempt == max_retry - 1:
-                raise
+        # Если все хорошо, возвращаем содержимое
+        return response.content
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 410 or e.response.status_code == 404:
+            print(f"Ресурс удален: {url}")
+            return None  # Возвращаем None для удаленных ресурсов
+        else:
+            print(f"Ошибка при загрузке {url}: {e}")
+            raise  # Повторяем попытку для других ошибок
+
+    except Exception as e:
+        print(f"Неожиданная ошибка при загрузке {url}: {e}")
+        sleep(3)  # Ждем перед повторной попыткой
+        raise
 
 def fetch_many(urls: Iterable[str]) -> Sequence[bytes | None]:
-    # Сохраняем интерфейс: функция принимает список URL-ов
+    # Используем list comprehension для выполнения запросов к каждому URL
     return [fetch_one(url) for url in urls]
 
 def main():
@@ -90,7 +41,4 @@ def main():
     print(f"Successfully fetched {len(results)} images.")
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        driver.quit()
+    main()
