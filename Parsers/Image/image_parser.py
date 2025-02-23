@@ -45,5 +45,10 @@ def find_images_by_word(word: str, amount_images: int = 10) -> list[str]:
         print(f"Ошибка при загрузке страницы для слова '{word}': {str(e)}")
         # Повторяем попытку или выбрасываем исключение после max_retry попыток
         raise
-
+print("strart")
 find_images_by_word("cat")
+print("complete")
+find_images_by_word("cat")
+print("complete")
+find_images_by_word("cat")
+print("complete")

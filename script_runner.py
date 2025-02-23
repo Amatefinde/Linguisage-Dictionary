@@ -1,5 +1,5 @@
-from scripts.collections.oxford5000 import sync_run
+from scripts.collections._100_000_word import get_100_000_word
 
 print("Download oxford 5000 words...")
-sync_run()
+
 print("Download successful")

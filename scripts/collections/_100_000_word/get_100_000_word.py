@@ -19,7 +19,7 @@ async def main():
     with open(path.join(current_dir, "wiki-100k.txt"), "r", encoding="utf-8") as file:
         aliases = file.readlines()
         aliases = clear_words(aliases)
-        await find_many_and_save_to_db(aliases, 8713)
+        await find_many_and_save_to_db(aliases, 1)
 
 
 asyncio.run(main())
