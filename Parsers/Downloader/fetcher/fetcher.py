@@ -6,7 +6,7 @@ from seleniumbase import Driver
 # Глобальный экземпляр браузера (постоянная сессия)
 driver = Driver(uc=True, headless=True)
 
-def fetch_one(dummy_request, url: str) -> bytes | None:
+def fetch_one( url: str) -> bytes | None:
     max_retry = 5       # Максимальное количество попыток
     retry_wait = 3      # Время ожидания между попытками (сек)
     for attempt in range(max_retry):
