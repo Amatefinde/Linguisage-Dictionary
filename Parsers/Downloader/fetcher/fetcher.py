@@ -81,7 +81,7 @@ def fetch_one( url: str) -> bytes | None:
                 raise
 
 def fetch_many(urls: Iterable[str]) -> Sequence[bytes | None]:
-    return [fetch_one(None, url) for url in urls]
+    return [fetch_one(url) for url in urls]
 
 def main():
     # Пример: загрузка изображения
