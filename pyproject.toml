@@ -9,7 +9,7 @@ readme = "README.md"
 python = ">=3.11,<3.13"
 aiohttp = "^3.9.1"
 beautifulsoup4 = "^4.12.2"
-
+seleniumbase= "4.34.15"
 python-dotenv = "^1.0.0"
 pydantic = "^2.5.2"
 fastapi = "^0.104.1"
@@ -35,7 +35,6 @@ fake-useragent = "^2.0.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.12.1"
-pytest = "^7.4.4"
 pytest-asyncio = "^0.23.3"
 mypy = "^1.8.0"
 
