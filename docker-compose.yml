@@ -17,6 +17,7 @@ services:
 #      if u haven't ssl cert just remove this line
       - /etc/letsencrypt:/linguisage/letsencrypt
       # - ${VOLUME_CERT}:/linguisage/letsencrypt
+    restart: unless-stopped
 
   postgres_db:
     image: postgres:15
@@ -28,9 +29,11 @@ services:
       - "9102:5432"
     volumes:
       - ${VOLUME_POSTGRES}:/var/lib/postgresql/data
+    restart: unless-stopped
 
   redis:
     image: redis:7.2.4
+    restart: unless-stopped
 
   celery:
     environment:
@@ -43,6 +46,7 @@ services:
       - redis
     volumes:
       - ${VOLUME_STATIC}:/linguisage/static
+    restart: unless-stopped
 
   flower:
     environment:
@@ -53,3 +57,4 @@ services:
     command: "celery -A background_tasks.celery:celery flower"
     ports:
       - "9105:5555"
+    restart: unless-stopped
