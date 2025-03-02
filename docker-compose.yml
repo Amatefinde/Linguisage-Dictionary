@@ -55,6 +55,9 @@ services:
     build:
       context: .
     command: "celery -A background_tasks.celery:celery flower --certfile='/linguisage/letsencrypt/live/linguisage.fun/fullchain.pem' --keyfile='/linguisage/letsencrypt/live/linguisage.fun/privkey.pem'"
+    volumes:
+
+      - /etc/letsencrypt:/linguisage/letsencrypt
     ports:
       - "9105:5555"
     restart: unless-stopped
