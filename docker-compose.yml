@@ -41,7 +41,7 @@ services:
       - DB_HOST=postgres_db
     build:
       context: .
-    command: "celery -A background_tasks.celery:celery worker --loglevel=INFO -n dictionary -Q dictionary_queue"
+    command: "celery -A background_tasks.celery:celery worker --loglevel=INFO -n dictionary -Q dictionary_queue --certfile /linguisage/letsencrypt/live/linguisage.fun/fullchain.pem --keyfile /linguisage/letsencrypt/live/linguisage.fun/privkey.pem"
     depends_on:
       - redis
     volumes:
