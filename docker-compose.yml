@@ -54,7 +54,7 @@ services:
       - DB_HOST=postgres_db
     build:
       context: .
-    command: "celery -A background_tasks.celery:celery flower --certfile='/linguisage/letsencrypt/live/linguisage.fun/fullchain.pem' --keyfile='/linguisage/letsencrypt/live/linguisage.fun/privkey.pem'"
+    command: "celery -A background_tasks.celery:celery flower --certfile='/linguisage/letsencrypt/live/linguisage.fun-0002/fullchain.pem' --keyfile='/linguisage/letsencrypt/live/linguisage.fun-0002/privkey.pem'"
     volumes:
 
       - /etc/letsencrypt:/linguisage/letsencrypt
